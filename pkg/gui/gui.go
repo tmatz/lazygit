@@ -389,7 +389,7 @@ type Modes struct {
 type guiMutexes struct {
 	RefreshingFilesMutex  *sync.Mutex
 	RefreshingStatusMutex *sync.Mutex
-	FetchMutex            *sync.Mutex
+	SyncMutex             *sync.Mutex
 	BranchCommitsMutex    *sync.Mutex
 	LineByLinePanelMutex  *sync.Mutex
 	SubprocessMutex       *sync.Mutex
@@ -505,7 +505,7 @@ func NewGui(
 		Mutexes: guiMutexes{
 			RefreshingFilesMutex:  &sync.Mutex{},
 			RefreshingStatusMutex: &sync.Mutex{},
-			FetchMutex:            &sync.Mutex{},
+			SyncMutex:             &sync.Mutex{},
 			BranchCommitsMutex:    &sync.Mutex{},
 			LineByLinePanelMutex:  &sync.Mutex{},
 			SubprocessMutex:       &sync.Mutex{},
@@ -527,7 +527,7 @@ func NewGui(
 		cmn,
 		osCommand,
 		gitConfig,
-		gui.Mutexes.FetchMutex,
+		gui.Mutexes.SyncMutex,
 	)
 	if err != nil {
 		return nil, err
@@ -656,7 +656,6 @@ func (gui *Gui) setControllers() {
 			getContexts,
 			gui.getSelectedRemote,
 			func(branches []*models.RemoteBranch) { gui.State.RemoteBranches = branches },
-			gui.Mutexes.FetchMutex,
 		),
 		Menu: controllers.NewMenuController(
 			controllerCommon,
