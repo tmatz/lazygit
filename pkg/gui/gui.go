@@ -124,7 +124,7 @@ type Gui struct {
 
 	suggestionsAsyncHandler *tasks.AsyncHandler
 
-	PopupHandler popup.IPopupHandler
+	PopupHandler types.IPopupHandler
 
 	IsNewRepo bool
 
@@ -143,7 +143,7 @@ type Gui struct {
 
 	PrevLayout PrevLayout
 
-	c                 *controllers.ControllerCommon
+	c                 *types.ControllerCommon
 	refHelper         *RefHelper
 	suggestionsHelper *SuggestionsHelper
 	fileHelper        *FileHelper
@@ -181,7 +181,7 @@ type GuiRepoState struct {
 
 	// Suggestions will sometimes appear when typing into a prompt
 	Suggestions    []*types.Suggestion
-	MenuItems      []*popup.MenuItem
+	MenuItems      []*types.MenuItem
 	BisectInfo     *git_commands.BisectInfo
 	Updating       bool
 	Panels         *panelStates
@@ -276,10 +276,6 @@ type remoteBranchesState struct {
 	listPanelState
 }
 
-type tagsPanelState struct {
-	listPanelState
-}
-
 type commitPanelState struct {
 	listPanelState
 
@@ -328,7 +324,6 @@ type panelStates struct {
 	Branches       *branchPanelState
 	Remotes        *remotePanelState
 	RemoteBranches *remoteBranchesState
-	Tags           *tagsPanelState
 	Commits        *commitPanelState
 	ReflogCommits  *reflogCommitPanelState
 	SubCommits     *subCommitPanelState
@@ -445,7 +440,6 @@ func (gui *Gui) resetState(filterPath string, reuseState bool) {
 			Branches:       &branchPanelState{listPanelState{SelectedLineIdx: 0}},
 			Remotes:        &remotePanelState{listPanelState{SelectedLineIdx: 0}},
 			RemoteBranches: &remoteBranchesState{listPanelState{SelectedLineIdx: -1}},
-			Tags:           &tagsPanelState{listPanelState{SelectedLineIdx: -1}},
 			Commits:        &commitPanelState{listPanelState: listPanelState{SelectedLineIdx: 0}, LimitCommits: true},
 			ReflogCommits:  &reflogCommitPanelState{listPanelState{SelectedLineIdx: 0}},
 			SubCommits:     &subCommitPanelState{listPanelState: listPanelState{SelectedLineIdx: 0}, refName: ""},
@@ -547,7 +541,7 @@ func NewGui(
 	)
 
 	guiCommon := &guiCommon{gui: gui, IPopupHandler: gui.PopupHandler}
-	controllerCommon := &controllers.ControllerCommon{IGuiCommon: guiCommon, Common: cmn}
+	controllerCommon := &types.ControllerCommon{IGuiCommon: guiCommon, Common: cmn}
 
 	// storing this stuff on the gui for now to ease refactoring
 	// TODO: reset these controllers upon changing repos due to state changing
@@ -579,12 +573,11 @@ func (gui *Gui) setControllers() {
 
 	tagsController := controllers.NewTagsController(
 		controllerCommon,
-		func() types.IListContext { return gui.State.Contexts.Tags },
+		func() *context.TagsContext { return gui.State.Contexts.Tags },
 		gui.git,
 		getContexts,
 		refHelper,
 		gui.suggestionsHelper,
-		gui.getSelectedTag,
 		gui.switchToSubCommitsContext,
 	)
 
@@ -905,7 +898,7 @@ func (gui *Gui) showIntroPopupMessage(done chan struct{}) error {
 		return gui.c.SaveAppState()
 	}
 
-	return gui.c.Ask(popup.AskOpts{
+	return gui.c.Ask(types.AskOpts{
 		Title:         "",
 		Prompt:        gui.c.Tr.IntroPopupMessage,
 		HandleConfirm: onConfirm,
@@ -940,7 +933,7 @@ func (gui *Gui) startBackgroundFetch() {
 	}
 	err := gui.backgroundFetch()
 	if err != nil && strings.Contains(err.Error(), "exit status 128") && isNew {
-		_ = gui.c.Ask(popup.AskOpts{
+		_ = gui.c.Ask(types.AskOpts{
 			Title:  gui.c.Tr.NoAutomaticGitFetchTitle,
 			Prompt: gui.c.Tr.NoAutomaticGitFetchBody,
 		})
