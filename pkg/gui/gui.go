@@ -68,6 +68,15 @@ func NewContextManager(initialContext types.Context) ContextManager {
 	}
 }
 
+type Helpers struct {
+	refs        *RefsHelper
+	bisect      *controllers.BisectHelper
+	suggestions *SuggestionsHelper
+	files       *FilesHelper
+	workingTree *WorkingTreeHelper
+	tags        *controllers.TagsHelper
+}
+
 type Repo string
 
 // Gui wraps the gocui Gui object which handles rendering and events
@@ -143,11 +152,8 @@ type Gui struct {
 
 	PrevLayout PrevLayout
 
-	c                 *types.ControllerCommon
-	refsHelper        *RefsHelper
-	suggestionsHelper *SuggestionsHelper
-	filesHelper       *FilesHelper
-	workingTreeHelper *WorkingTreeHelper
+	c       *types.ControllerCommon
+	helpers *Helpers
 }
 
 // we keep track of some stuff from one render to the next to see if certain
@@ -561,23 +567,24 @@ func (gui *Gui) setControllers() {
 	getState := func() *GuiRepoState { return gui.State }
 	getContexts := func() context.ContextTree { return gui.State.Contexts }
 	// TODO: have a getGit function too
-	refsHelper := NewRefsHelper(
-		controllerCommon,
-		gui.git,
-		getState,
-	)
-	gui.refsHelper = refsHelper
-	gui.suggestionsHelper = NewSuggestionsHelper(controllerCommon, getState, gui.refreshSuggestions)
-	gui.filesHelper = NewFilesHelper(controllerCommon, gui.git, osCommand)
-	gui.workingTreeHelper = NewWorkingTreeHelper(func() *filetree.FileTreeViewModel { return gui.State.FileTreeViewModel })
-
-	tagsHelper := controllers.NewTagsHelper(controllerCommon, gui.git)
+	gui.helpers = &Helpers{
+		refs: NewRefsHelper(
+			controllerCommon,
+			gui.git,
+			getState,
+		),
+		bisect:      controllers.NewBisectHelper(controllerCommon, gui.git),
+		suggestions: NewSuggestionsHelper(controllerCommon, getState, gui.refreshSuggestions),
+		files:       NewFilesHelper(controllerCommon, gui.git, osCommand),
+		workingTree: NewWorkingTreeHelper(func() *filetree.FileTreeViewModel { return gui.State.FileTreeViewModel }),
+		tags:        controllers.NewTagsHelper(controllerCommon, gui.git),
+	}
 
 	syncController := controllers.NewSyncController(
 		controllerCommon,
 		gui.git,
 		gui.getCheckedOutBranch,
-		gui.suggestionsHelper,
+		gui.helpers.suggestions,
 		gui.getSuggestedRemote,
 		gui.checkMergeOrRebase,
 	)
@@ -606,19 +613,19 @@ func (gui *Gui) setControllers() {
 			func() []*models.Commit { return gui.State.Commits },
 			gui.getSelectedPath,
 			gui.switchToMerge,
-			gui.suggestionsHelper,
-			gui.refsHelper,
-			gui.filesHelper,
-			gui.workingTreeHelper,
+			gui.helpers.suggestions,
+			gui.helpers.refs,
+			gui.helpers.files,
+			gui.helpers.workingTree,
 		),
 		Tags: controllers.NewTagsController(
 			controllerCommon,
 			func() *context.TagsContext { return gui.State.Contexts.Tags },
 			gui.git,
 			getContexts,
-			tagsHelper,
-			refsHelper,
-			gui.suggestionsHelper,
+			gui.helpers.tags,
+			gui.helpers.refs,
+			gui.helpers.suggestions,
 			gui.switchToSubCommitsContext,
 		),
 		LocalCommits: controllers.NewLocalCommitsController(
@@ -626,8 +633,8 @@ func (gui *Gui) setControllers() {
 			func() types.IListContext { return gui.State.Contexts.BranchCommits },
 			osCommand,
 			gui.git,
-			tagsHelper,
-			refsHelper,
+			gui.helpers.tags,
+			gui.helpers.refs,
 			gui.getSelectedLocalCommit,
 			func() []*models.Commit { return gui.State.Commits },
 			func() int { return gui.State.Panels.Commits.SelectedLineIdx },
@@ -658,14 +665,15 @@ func (gui *Gui) setControllers() {
 			controllerCommon,
 			func() types.IListContext { return gui.State.Contexts.BranchCommits },
 			gui.git,
+			gui.helpers.bisect,
 			gui.getSelectedLocalCommit,
 			func() []*models.Commit { return gui.State.Commits },
 		),
 		Undo: controllers.NewUndoController(
 			controllerCommon,
 			gui.git,
-			refsHelper,
-			gui.workingTreeHelper,
+			gui.helpers.refs,
+			gui.helpers.workingTree,
 			func() []*models.Commit { return gui.State.FilteredReflogCommits },
 		),
 		Sync: syncController,
