@@ -94,7 +94,7 @@ func newLogger(config config.AppConfigurer) *logrus.Entry {
 }
 
 // NewApp bootstrap a new application
-func NewApp(config config.AppConfigurer, filterPath string) (*App, error) {
+func NewApp(config config.AppConfigurer) (*App, error) {
 	userConfig := config.GetUserConfig()
 
 	app := &App{
@@ -135,7 +135,7 @@ func NewApp(config config.AppConfigurer, filterPath string) (*App, error) {
 
 	gitConfig := git_config.NewStdCachedGitConfig(app.Log)
 
-	app.Gui, err = gui.NewGui(app.Common, config, gitConfig, app.Updater, filterPath, showRecentRepos)
+	app.Gui, err = gui.NewGui(app.Common, config, gitConfig, app.Updater, showRecentRepos)
 	if err != nil {
 		return app, err
 	}
@@ -236,7 +236,7 @@ func (app *App) setupRepo() (bool, error) {
 	return false, nil
 }
 
-func (app *App) Run() error {
+func (app *App) Run(filterPath string) error {
 	if app.ClientContext == "INTERACTIVE_REBASE" {
 		return app.Rebase()
 	}
@@ -245,7 +245,7 @@ func (app *App) Run() error {
 		os.Exit(0)
 	}
 
-	err := app.Gui.RunAndHandleError()
+	err := app.Gui.RunAndHandleError(filterPath)
 	return err
 }
 

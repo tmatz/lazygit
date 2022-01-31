@@ -5,7 +5,6 @@ import (
 	"path/filepath"
 
 	"github.com/jesseduffield/lazygit/pkg/commands"
-	"github.com/jesseduffield/lazygit/pkg/commands/git_config"
 	"github.com/jesseduffield/lazygit/pkg/env"
 	"github.com/jesseduffield/lazygit/pkg/gui/style"
 	"github.com/jesseduffield/lazygit/pkg/gui/types"
@@ -71,17 +70,6 @@ func (gui *Gui) dispatchSwitchToRepo(path string, reuse bool) error {
 		return err
 	}
 
-	newGitCommand, err := commands.NewGitCommand(
-		gui.Common,
-		gui.OSCommand,
-		git_config.NewStdCachedGitConfig(gui.Log),
-		gui.Mutexes.SyncMutex,
-	)
-	if err != nil {
-		return err
-	}
-	gui.git = newGitCommand
-
 	// these two mutexes are used by our background goroutines (triggered via `gui.goEvery`. We don't want to
 	// switch to a repo while one of these goroutines is in the process of updating something
 	gui.Mutexes.SyncMutex.Lock()
@@ -90,9 +78,7 @@ func (gui *Gui) dispatchSwitchToRepo(path string, reuse bool) error {
 	gui.Mutexes.RefreshingFilesMutex.Lock()
 	defer gui.Mutexes.RefreshingFilesMutex.Unlock()
 
-	gui.resetState("", reuse)
-
-	return nil
+	return gui.onNewRepo("", reuse)
 }
 
 // updateRecentRepoList registers the fact that we opened lazygit in this repo,
