@@ -214,6 +214,7 @@ type Controllers struct {
 	Bisect       *controllers.BisectController
 	Undo         *controllers.UndoController
 	Sync         *controllers.SyncController
+	Global       *controllers.GlobalController
 }
 
 type listPanelState struct {
@@ -581,6 +582,10 @@ func (gui *Gui) resetControllers() {
 
 	gui.Controllers = Controllers{
 		Submodules: submodulesController,
+		Global: controllers.NewGlobalController(
+			controllerCommon,
+			osCommand,
+		),
 		Files: controllers.NewFilesController(
 			controllerCommon,
 			gui.State.Contexts.Files,
@@ -664,6 +669,7 @@ func (gui *Gui) resetControllers() {
 	}
 
 	gui.State.Contexts.Submodules.AddKeybindingsFn(gui.Controllers.Submodules.GetKeybindings)
+	gui.Controllers.Files.Attach(gui.State.Contexts.Files)
 	gui.State.Contexts.Files.AddKeybindingsFn(gui.Controllers.Files.GetKeybindings)
 	gui.State.Contexts.Tags.AddKeybindingsFn(gui.Controllers.Tags.GetKeybindings)
 	// TODO: commit to one name here: local commits or branch commits
