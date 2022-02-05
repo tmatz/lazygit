@@ -17,7 +17,7 @@ var _ types.IListContext = (*TagsContext)(nil)
 
 func NewTagsContext(
 	getModel func() []*models.Tag,
-	getView func() *gocui.View,
+	view *gocui.View,
 	getDisplayStrings func(startIdx int, length int) [][]string,
 
 	onFocus func(...types.OnFocusOpts) error,
@@ -38,7 +38,7 @@ func NewTagsContext(
 	takeFocus := func() error { return c.PushContext(self) }
 
 	list := NewTagsViewModel(getModel)
-	viewTrait := NewViewTrait(getView)
+	viewTrait := NewViewTrait(view)
 	listContextTrait := &ListContextTrait{
 		base:      baseContext,
 		list:      list,

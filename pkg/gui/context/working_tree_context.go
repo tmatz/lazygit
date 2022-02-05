@@ -17,7 +17,7 @@ var _ types.IListContext = (*WorkingTreeContext)(nil)
 
 func NewWorkingTreeContext(
 	getModel func() []*models.File,
-	getView func() *gocui.View,
+	view *gocui.View,
 	getDisplayStrings func(startIdx int, length int) [][]string,
 
 	onFocus func(...types.OnFocusOpts) error,
@@ -38,7 +38,7 @@ func NewWorkingTreeContext(
 	takeFocus := func() error { return c.PushContext(self) }
 
 	viewModel := filetree.NewFileTreeViewModel(getModel, c.Log, c.UserConfig.Gui.ShowFileTree)
-	viewTrait := NewViewTrait(getView)
+	viewTrait := NewViewTrait(view)
 	listContextTrait := &ListContextTrait{
 		base:      baseContext,
 		list:      viewModel,

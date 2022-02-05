@@ -3,7 +3,6 @@ package gui
 import (
 	"log"
 
-	"github.com/jesseduffield/gocui"
 	"github.com/jesseduffield/lazygit/pkg/commands/git_commands"
 	"github.com/jesseduffield/lazygit/pkg/commands/models"
 	"github.com/jesseduffield/lazygit/pkg/gui/context"
@@ -32,7 +31,7 @@ func (gui *Gui) menuListContext() types.IListContext {
 func (gui *Gui) filesListContext() *context.WorkingTreeContext {
 	return context.NewWorkingTreeContext(
 		func() []*models.File { return gui.State.Model.Files },
-		func() *gocui.View { return gui.Views.Files },
+		gui.Views.Files,
 		func(startIdx int, length int) [][]string {
 			lines := presentation.RenderFileTree(gui.State.Contexts.Files.FileTreeViewModel, gui.State.Modes.Diffing.Ref, gui.State.Model.Submodules)
 			mappedLines := make([][]string, len(lines))
@@ -140,7 +139,7 @@ func (gui *Gui) withDiffModeCheck(f func() error) func() error {
 func (gui *Gui) tagsListContext() *context.TagsContext {
 	return context.NewTagsContext(
 		func() []*models.Tag { return gui.State.Model.Tags },
-		func() *gocui.View { return gui.Views.Branches },
+		gui.Views.Branches,
 		func(startIdx int, length int) [][]string {
 			return presentation.GetTagListDisplayStrings(gui.State.Model.Tags, gui.State.Modes.Diffing.Ref)
 		},
@@ -325,7 +324,7 @@ func (gui *Gui) stashListContext() types.IListContext {
 func (gui *Gui) commitFilesListContext() *context.CommitFilesContext {
 	return context.NewCommitFilesContext(
 		func() []*models.CommitFile { return gui.State.Model.CommitFiles },
-		func() *gocui.View { return gui.Views.CommitFiles },
+		gui.Views.CommitFiles,
 		func(startIdx int, length int) [][]string {
 			if gui.State.Contexts.CommitFiles.CommitFileTreeViewModel.GetItemsLength() == 0 {
 				return [][]string{{style.FgRed.Sprint("(none)")}}

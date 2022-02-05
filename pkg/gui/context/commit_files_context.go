@@ -17,7 +17,7 @@ var _ types.IListContext = (*CommitFilesContext)(nil)
 
 func NewCommitFilesContext(
 	getModel func() []*models.CommitFile,
-	getView func() *gocui.View,
+	view *gocui.View,
 	getDisplayStrings func(startIdx int, length int) [][]string,
 
 	onFocus func(...types.OnFocusOpts) error,
@@ -38,7 +38,7 @@ func NewCommitFilesContext(
 	takeFocus := func() error { return c.PushContext(self) }
 
 	viewModel := filetree.NewCommitFileTreeViewModel(getModel, c.Log, c.UserConfig.Gui.ShowFileTree)
-	viewTrait := NewViewTrait(getView)
+	viewTrait := NewViewTrait(view)
 	listContextTrait := &ListContextTrait{
 		base:      baseContext,
 		list:      viewModel,
