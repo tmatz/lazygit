@@ -265,3 +265,11 @@ func (self *ListContext) keybindings(opts types.KeybindingsOpts) []*types.Bindin
 		},
 	}
 }
+
+func (self *ListContext) GetList() types.IList {
+	return nil
+}
+
+func (self *ListContext) GetViewTrait() types.IViewTrait {
+	return nil
+}

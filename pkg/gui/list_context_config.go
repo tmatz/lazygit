@@ -11,21 +11,15 @@ import (
 	"github.com/jesseduffield/lazygit/pkg/gui/types"
 )
 
-func (gui *Gui) menuListContext() types.IListContext {
-	return (&ListContext{
-		BaseContext: context.NewBaseContext(context.NewBaseContextOpts{
-			ViewName:        "menu",
-			Key:             "menu",
-			Kind:            types.PERSISTENT_POPUP,
-			OnGetOptionsMap: gui.getMenuOptions,
-			Focusable:       true,
-		}),
-		GetItemsLength:  func() int { return gui.Views.Menu.LinesHeight() },
-		OnGetPanelState: func() types.IListPanelState { return gui.State.Panels.Menu },
-		Gui:             gui,
-
-		// no GetDisplayStrings field because we do a custom render on menu creation
-	}).attachKeybindings()
+func (gui *Gui) menuListContext() *context.MenuContext {
+	return context.NewMenuContext(
+		gui.Views.Menu,
+		nil,
+		nil,
+		nil,
+		gui.c,
+		gui.getMenuOptions,
+	)
 }
 
 func (gui *Gui) filesListContext() *context.WorkingTreeContext {
@@ -150,25 +144,14 @@ func (gui *Gui) tagsListContext() *context.TagsContext {
 	)
 }
 
-func (gui *Gui) branchCommitsListContext() types.IListContext {
-	parseEmoji := gui.c.UserConfig.Git.ParseEmoji
-	return (&ListContext{
-		BaseContext: context.NewBaseContext(context.NewBaseContextOpts{
-			ViewName:   "commits",
-			WindowName: "commits",
-			Key:        context.BRANCH_COMMITS_CONTEXT_KEY,
-			Kind:       types.SIDE_CONTEXT,
-			Focusable:  true,
-		}),
-		GetItemsLength:  func() int { return len(gui.State.Model.Commits) },
-		OnGetPanelState: func() types.IListPanelState { return gui.State.Panels.Commits },
-		OnFocus:         OnFocusWrapper(gui.onCommitFocus),
-		OnRenderToMain:  OnFocusWrapper(gui.withDiffModeCheck(gui.branchCommitsRenderToMain)),
-		Gui:             gui,
-		GetDisplayStrings: func(startIdx int, length int) [][]string {
+func (gui *Gui) branchCommitsListContext() *context.LocalCommitsContext {
+	return context.NewLocalCommitsContext(
+		func() []*models.Commit { return gui.State.Model.Commits },
+		gui.Views.Commits,
+		func(startIdx int, length int) [][]string {
 			selectedCommitSha := ""
 			if gui.currentContext().GetKey() == context.BRANCH_COMMITS_CONTEXT_KEY {
-				selectedCommit := gui.getSelectedLocalCommit()
+				selectedCommit := gui.State.Contexts.BranchCommits.GetSelectedCommit()
 				if selectedCommit != nil {
 					selectedCommitSha = selectedCommit.Sha
 				}
@@ -178,7 +161,7 @@ func (gui *Gui) branchCommitsListContext() types.IListContext {
 				gui.State.ScreenMode != SCREEN_NORMAL,
 				gui.helpers.CherryPick.CherryPickedCommitShaMap(),
 				gui.State.Modes.Diffing.Ref,
-				parseEmoji,
+				gui.c.UserConfig.Git.ParseEmoji,
 				selectedCommitSha,
 				startIdx,
 				length,
@@ -186,15 +169,11 @@ func (gui *Gui) branchCommitsListContext() types.IListContext {
 				gui.State.Model.BisectInfo,
 			)
 		},
-		OnGetSelectedItemId: func() string {
-			item := gui.getSelectedLocalCommit()
-			if item == nil {
-				return ""
-			}
-			return item.ID()
-		},
-		RenderSelection: true,
-	}).attachKeybindings()
+		OnFocusWrapper(gui.onCommitFocus),
+		OnFocusWrapper(gui.withDiffModeCheck(gui.branchCommitsRenderToMain)),
+		nil,
+		gui.c,
+	)
 }
 
 func (gui *Gui) subCommitsListContext() types.IListContext {

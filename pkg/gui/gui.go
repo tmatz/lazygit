@@ -171,11 +171,11 @@ type GuiRepoState struct {
 
 	// Suggestions will sometimes appear when typing into a prompt
 	Suggestions []*types.Suggestion
-	MenuItems   []*types.MenuItem
 
 	Updating       bool
 	Panels         *panelStates
 	SplitMainPanel bool
+	LimitCommits   bool
 
 	IsRefreshingFiles bool
 	Searching         searchingState
@@ -258,12 +258,6 @@ type remoteBranchesState struct {
 	listPanelState
 }
 
-type commitPanelState struct {
-	listPanelState
-
-	LimitCommits bool
-}
-
 type reflogCommitPanelState struct {
 	listPanelState
 }
@@ -277,11 +271,6 @@ type subCommitPanelState struct {
 
 type stashPanelState struct {
 	listPanelState
-}
-
-type menuPanelState struct {
-	listPanelState
-	OnPress func() error
 }
 
 type submodulePanelState struct {
@@ -298,11 +287,9 @@ type panelStates struct {
 	Branches       *branchPanelState
 	Remotes        *remotePanelState
 	RemoteBranches *remoteBranchesState
-	Commits        *commitPanelState
 	ReflogCommits  *reflogCommitPanelState
 	SubCommits     *subCommitPanelState
 	Stash          *stashPanelState
-	Menu           *menuPanelState
 	LineByLine     *LblPanelState
 	Merging        *MergingPanelState
 	Submodules     *submodulePanelState
@@ -446,18 +433,17 @@ func (gui *Gui) resetState(filterPath string, reuseState bool) {
 			Branches:       &branchPanelState{listPanelState{SelectedLineIdx: 0}},
 			Remotes:        &remotePanelState{listPanelState{SelectedLineIdx: 0}},
 			RemoteBranches: &remoteBranchesState{listPanelState{SelectedLineIdx: -1}},
-			Commits:        &commitPanelState{listPanelState: listPanelState{SelectedLineIdx: 0}, LimitCommits: true},
 			ReflogCommits:  &reflogCommitPanelState{listPanelState{SelectedLineIdx: 0}},
 			SubCommits:     &subCommitPanelState{listPanelState: listPanelState{SelectedLineIdx: 0}, refName: ""},
 			Stash:          &stashPanelState{listPanelState{SelectedLineIdx: -1}},
-			Menu:           &menuPanelState{listPanelState: listPanelState{SelectedLineIdx: 0}, OnPress: nil},
 			Suggestions:    &suggestionsPanelState{listPanelState: listPanelState{SelectedLineIdx: 0}},
 			Merging: &MergingPanelState{
 				State:                 mergeconflicts.NewState(),
 				UserVerticalScrolling: false,
 			},
 		},
-		Ptmx: nil,
+		LimitCommits: true,
+		Ptmx:         nil,
 		Modes: Modes{
 			Filtering:     filtering.New(filterPath),
 			CherryPicking: cherrypicking.New(),
@@ -574,7 +560,7 @@ func (gui *Gui) resetControllers() {
 			controllerCommon,
 			gui.git,
 			gui.State.Contexts,
-			func() { gui.State.Panels.Commits.LimitCommits = true },
+			func() { gui.State.LimitCommits = true },
 		),
 		Bisect:      controllers.NewBisectHelper(controllerCommon, gui.git),
 		Suggestions: controllers.NewSuggestionsHelper(controllerCommon, model, gui.refreshSuggestions),
@@ -613,7 +599,6 @@ func (gui *Gui) resetControllers() {
 		gui.State.Contexts.BranchCommits,
 		gui.git,
 		gui.helpers.Bisect,
-		gui.getSelectedLocalCommit,
 		func() []*models.Commit { return gui.State.Model.Commits },
 	)
 
@@ -662,15 +647,13 @@ func (gui *Gui) resetControllers() {
 			gui.helpers.Refs,
 			gui.helpers.CherryPick,
 			gui.helpers.Rebase,
-			gui.getSelectedLocalCommit,
 			model,
-			func() int { return gui.State.Panels.Commits.SelectedLineIdx },
 			gui.helpers.Rebase.CheckMergeOrRebase,
 			syncController.HandlePull,
 			gui.getHostingServiceMgr,
 			gui.SwitchToCommitFilesContext,
-			func() bool { return gui.State.Panels.Commits.LimitCommits },
-			func(value bool) { gui.State.Panels.Commits.LimitCommits = value },
+			func() bool { return gui.State.LimitCommits },
+			func(value bool) { gui.State.LimitCommits = value },
 			func() bool { return gui.ShowWholeGitGraph },
 			func(value bool) { gui.ShowWholeGitGraph = value },
 		),
@@ -685,7 +668,6 @@ func (gui *Gui) resetControllers() {
 		Menu: controllers.NewMenuController(
 			controllerCommon,
 			gui.State.Contexts.Menu,
-			gui.getSelectedMenuItem,
 		),
 		Undo: controllers.NewUndoController(
 			controllerCommon,
@@ -704,6 +686,11 @@ func (gui *Gui) resetControllers() {
 	controllers.AttachControllers(gui.State.Contexts.Remotes, gui.Controllers.Remotes)
 	controllers.AttachControllers(gui.State.Contexts.Menu, gui.Controllers.Menu)
 	controllers.AttachControllers(gui.State.Contexts.Global, gui.Controllers.Sync, gui.Controllers.Undo, gui.Controllers.Global)
+
+	listControllerFactory := controllers.NewListControllerFactory(gui.c)
+	for _, context := range gui.getListContexts() {
+		controllers.AttachControllers(context, listControllerFactory.Create(context))
+	}
 }
 
 var RuneReplacements = map[rune]string{

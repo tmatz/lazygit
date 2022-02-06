@@ -211,7 +211,7 @@ func (gui *Gui) refreshCommitsWithLimit() error {
 
 	commits, err := gui.git.Loaders.Commits.GetCommits(
 		loaders.GetCommitsOptions{
-			Limit:                gui.State.Panels.Commits.LimitCommits,
+			Limit:                gui.State.LimitCommits,
 			FilterPath:           gui.State.Modes.Filtering.GetPath(),
 			IncludeRebaseCommits: true,
 			RefName:              gui.refForLog(),

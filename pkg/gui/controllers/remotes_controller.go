@@ -1,7 +1,6 @@
 package controllers
 
 import (
-	"github.com/jesseduffield/gocui"
 	"github.com/jesseduffield/lazygit/pkg/commands"
 	"github.com/jesseduffield/lazygit/pkg/commands/models"
 	"github.com/jesseduffield/lazygit/pkg/gui/context"
@@ -48,10 +47,10 @@ func (self *RemotesController) GetKeybindings(opts types.KeybindingsOpts) []*typ
 			Key:     opts.GetKey(opts.Config.Universal.GoInto),
 			Handler: self.checkSelected(self.enter),
 		},
-		{
-			Key:     gocui.MouseLeft,
-			Handler: func() error { return self.context.HandleClick(self.checkSelected(self.enter)) },
-		},
+		// {
+		// 	Key:     gocui.MouseLeft,
+		// 	Handler: func() error { return self.context.HandleClick(self.checkSelected(self.enter)) },
+		// },
 		{
 			Key:         opts.GetKey(opts.Config.Branches.FetchRemote),
 			Handler:     self.checkSelected(self.fetch),

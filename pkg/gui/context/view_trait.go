@@ -2,6 +2,7 @@ package context
 
 import (
 	"github.com/jesseduffield/gocui"
+	"github.com/jesseduffield/lazygit/pkg/gui/types"
 	"github.com/jesseduffield/lazygit/pkg/utils"
 )
 
@@ -10,6 +11,8 @@ const HORIZONTAL_SCROLL_FACTOR = 3
 type ViewTrait struct {
 	view *gocui.View
 }
+
+var _ types.IViewTrait = &ViewTrait{}
 
 func NewViewTrait(view *gocui.View) *ViewTrait {
 	return &ViewTrait{view: view}

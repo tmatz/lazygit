@@ -9,7 +9,6 @@ import (
 
 type TagsContext struct {
 	*TagsViewModel
-	*BaseContext
 	*ListContextTrait
 }
 
@@ -26,43 +25,28 @@ func NewTagsContext(
 
 	c *types.ControllerCommon,
 ) *TagsContext {
-	baseContext := NewBaseContext(NewBaseContextOpts{
-		ViewName:   "branches",
-		WindowName: "branches",
-		Key:        TAGS_CONTEXT_KEY,
-		Kind:       types.SIDE_CONTEXT,
-		Focusable:  true,
-	})
+	viewModel := NewTagsViewModel(getModel)
 
-	self := &TagsContext{}
-	takeFocus := func() error { return c.PushContext(self) }
-
-	list := NewTagsViewModel(getModel)
-	viewTrait := NewViewTrait(view)
-	listContextTrait := &ListContextTrait{
-		base:      baseContext,
-		list:      list,
-		viewTrait: viewTrait,
-
-		GetDisplayStrings: getDisplayStrings,
-		OnFocus:           onFocus,
-		OnRenderToMain:    onRenderToMain,
-		OnFocusLost:       onFocusLost,
-		takeFocus:         takeFocus,
-
-		// TODO: handle this in a trait
-		RenderSelection: false,
-
-		c: c,
+	return &TagsContext{
+		TagsViewModel: viewModel,
+		ListContextTrait: &ListContextTrait{
+			Context: NewSimpleContext(NewBaseContext(NewBaseContextOpts{
+				ViewName:   "branches",
+				WindowName: "branches",
+				Key:        TAGS_CONTEXT_KEY,
+				Kind:       types.SIDE_CONTEXT,
+				Focusable:  true,
+			}), ContextCallbackOpts{
+				OnFocus:        onFocus,
+				OnFocusLost:    onFocusLost,
+				OnRenderToMain: onRenderToMain,
+			}),
+			list:              viewModel,
+			viewTrait:         NewViewTrait(view),
+			getDisplayStrings: getDisplayStrings,
+			c:                 c,
+		},
 	}
-
-	baseContext.AddKeybindingsFn(listContextTrait.keybindings)
-
-	self.BaseContext = baseContext
-	self.ListContextTrait = listContextTrait
-	self.TagsViewModel = list
-
-	return self
 }
 
 func (self *TagsContext) GetSelectedItemId() string {
@@ -79,6 +63,16 @@ type TagsViewModel struct {
 	getModel func() []*models.Tag
 }
 
+func NewTagsViewModel(getModel func() []*models.Tag) *TagsViewModel {
+	self := &TagsViewModel{
+		getModel: getModel,
+	}
+
+	self.ListCursor = traits.NewListCursor(self)
+
+	return self
+}
+
 func (self *TagsViewModel) GetItemsLength() int {
 	return len(self.getModel())
 }
@@ -89,14 +83,4 @@ func (self *TagsViewModel) GetSelectedTag() *models.Tag {
 	}
 
 	return self.getModel()[self.GetSelectedLineIdx()]
-}
-
-func NewTagsViewModel(getModel func() []*models.Tag) *TagsViewModel {
-	self := &TagsViewModel{
-		getModel: getModel,
-	}
-
-	self.ListCursor = traits.NewListCursor(self)
-
-	return self
 }
