@@ -144,9 +144,6 @@ type Gui struct {
 	// flag as to whether or not the diff view should ignore whitespace
 	IgnoreWhitespaceInDiffView bool
 
-	// if this is true, we'll load our commits using `git log --all`
-	ShowWholeGitGraph bool
-
 	// we use this to decide whether we'll return to the original directory that
 	// lazygit was opened in, or if we'll retain the one we're currently in.
 	RetainOriginalDir bool
@@ -590,8 +587,6 @@ func (gui *Gui) resetControllers() {
 			syncController.HandlePull,
 			gui.getHostingServiceMgr,
 			gui.SwitchToCommitFilesContext,
-			func() bool { return gui.ShowWholeGitGraph },
-			func(value bool) { gui.ShowWholeGitGraph = value },
 		),
 		Remotes: controllers.NewRemotesController(
 			controllerCommon,

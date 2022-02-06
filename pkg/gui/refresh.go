@@ -215,7 +215,7 @@ func (gui *Gui) refreshCommitsWithLimit() error {
 			FilterPath:           gui.State.Modes.Filtering.GetPath(),
 			IncludeRebaseCommits: true,
 			RefName:              gui.refForLog(),
-			All:                  gui.ShowWholeGitGraph,
+			All:                  gui.State.Contexts.BranchCommits.GetShowWholeGitGraph(),
 		},
 	)
 	if err != nil {

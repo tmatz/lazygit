@@ -38,8 +38,6 @@ type LocalCommitsController struct {
 	pullFiles                  PullFilesFn
 	getHostingServiceMgr       GetHostingServiceMgrFn
 	switchToCommitFilesContext SwitchToCommitFilesContextFn
-	getShowWholeGitGraph       func() bool
-	setShowWholeGitGraph       func(bool)
 }
 
 var _ types.IController = &LocalCommitsController{}
@@ -58,8 +56,6 @@ func NewLocalCommitsController(
 	pullFiles PullFilesFn,
 	getHostingServiceMgr GetHostingServiceMgrFn,
 	switchToCommitFilesContext SwitchToCommitFilesContextFn,
-	getShowWholeGitGraph func() bool,
-	setShowWholeGitGraph func(bool),
 ) *LocalCommitsController {
 	return &LocalCommitsController{
 		baseController:             baseController{},
@@ -76,8 +72,6 @@ func NewLocalCommitsController(
 		pullFiles:                  pullFiles,
 		getHostingServiceMgr:       getHostingServiceMgr,
 		switchToCommitFilesContext: switchToCommitFilesContext,
-		getShowWholeGitGraph:       getShowWholeGitGraph,
-		setShowWholeGitGraph:       setShowWholeGitGraph,
 	}
 }
 
@@ -564,10 +558,9 @@ func (self *LocalCommitsController) afterRevertCommit() error {
 
 func (self *LocalCommitsController) enter(commit *models.Commit) error {
 	return self.switchToCommitFilesContext(SwitchToCommitFilesContextOpts{
-		RefName:    commit.Sha,
-		CanRebase:  true,
-		Context:    self.context,
-		WindowName: "commits",
+		RefName:   commit.Sha,
+		CanRebase: true,
+		Context:   self.context,
 	})
 }
 
@@ -684,9 +677,9 @@ func (self *LocalCommitsController) handleOpenLogMenu() error {
 			{
 				DisplayString: self.c.Tr.ToggleShowGitGraphAll,
 				OnPress: func() error {
-					self.setShowWholeGitGraph(!self.getShowWholeGitGraph())
+					self.context.SetShowWholeGitGraph(!self.context.GetShowWholeGitGraph())
 
-					if self.getShowWholeGitGraph() {
+					if self.context.GetShowWholeGitGraph() {
 						self.context.SetLimitCommits(false)
 					}
 

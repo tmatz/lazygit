@@ -265,7 +265,7 @@ func (gui *Gui) SwitchToCommitFilesContext(opts controllers.SwitchToCommitFilesC
 	gui.State.Contexts.CommitFiles.SetRefName(opts.RefName)
 	gui.State.Contexts.CommitFiles.SetCanRebase(opts.CanRebase)
 	gui.State.Contexts.CommitFiles.SetParentContext(opts.Context)
-	gui.State.Contexts.CommitFiles.SetWindowName(opts.WindowName)
+	gui.State.Contexts.CommitFiles.SetWindowName(opts.Context.GetWindowName())
 
 	if err := gui.refreshCommitFilesView(); err != nil {
 		return err
