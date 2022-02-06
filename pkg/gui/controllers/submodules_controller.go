@@ -14,7 +14,6 @@ import (
 type SubmodulesController struct {
 	baseController
 	*controllerCommon
-	context *context.SubmodulesContext
 
 	enterSubmodule func(submodule *models.SubmoduleConfig) error
 }
@@ -28,7 +27,6 @@ func NewSubmodulesController(
 	return &SubmodulesController{
 		baseController:   baseController{},
 		controllerCommon: controllerCommon,
-		context:          controllerCommon.contexts.Submodules,
 		enterSubmodule:   enterSubmodule,
 	}
 }
@@ -73,7 +71,7 @@ func (self *SubmodulesController) GetKeybindings(opts types.KeybindingsOpts) []*
 		},
 		// {
 		// 	Key:     gocui.MouseLeft,
-		// 	Handler: func() error { return self.context.HandleClick(self.checkSelected(self.enter)) },
+		// 	Handler: func() error { return self.context().HandleClick(self.checkSelected(self.enter)) },
 		// },
 	}
 }
@@ -221,7 +219,7 @@ func (self *SubmodulesController) remove(submodule *models.SubmoduleConfig) erro
 
 func (self *SubmodulesController) checkSelected(callback func(*models.SubmoduleConfig) error) func() error {
 	return func() error {
-		submodule := self.context.GetSelected()
+		submodule := self.context().GetSelected()
 		if submodule == nil {
 			return nil
 		}
@@ -231,5 +229,9 @@ func (self *SubmodulesController) checkSelected(callback func(*models.SubmoduleC
 }
 
 func (self *SubmodulesController) Context() types.Context {
-	return self.context
+	return self.context()
+}
+
+func (self *SubmodulesController) context() *context.SubmodulesContext {
+	return self.contexts.Submodules
 }

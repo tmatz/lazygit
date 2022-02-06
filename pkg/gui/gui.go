@@ -552,6 +552,8 @@ func (gui *Gui) resetControllers() {
 		Sync: syncController,
 	}
 
+	branchesController := controllers.NewBranchesController(common)
+
 	switchToSubCommitsControllerFactory := controllers.NewSubCommitsSwitchControllerFactory(
 		common,
 		func(commits []*models.Commit) { gui.State.Model.SubCommits = commits },
@@ -565,6 +567,7 @@ func (gui *Gui) resetControllers() {
 		controllers.AttachControllers(context, switchToSubCommitsControllerFactory.Create(context))
 	}
 
+	controllers.AttachControllers(gui.State.Contexts.Branches, branchesController)
 	controllers.AttachControllers(gui.State.Contexts.Files, gui.Controllers.Files)
 	controllers.AttachControllers(gui.State.Contexts.Tags, gui.Controllers.Tags)
 	controllers.AttachControllers(gui.State.Contexts.Submodules, gui.Controllers.Submodules)

@@ -19,7 +19,6 @@ import (
 type FilesController struct {
 	baseController
 	*controllerCommon
-	context *context.WorkingTreeContext
 
 	enterSubmodule         func(submodule *models.SubmoduleConfig) error
 	setCommitMessage       func(message string)
@@ -40,7 +39,6 @@ func NewFilesController(
 ) *FilesController {
 	return &FilesController{
 		controllerCommon:       common,
-		context:                common.contexts.Files,
 		enterSubmodule:         enterSubmodule,
 		setCommitMessage:       setCommitMessage,
 		withGpgHandling:        withGpgHandling,
@@ -58,7 +56,7 @@ func (self *FilesController) GetKeybindings(opts types.KeybindingsOpts) []*types
 		},
 		// {
 		// 	Key:     gocui.MouseLeft,
-		// 	Handler: func() error { return self.context.HandleClick(self.checkSelectedFileNode(self.press)) },
+		// 	Handler: func() error { return self.context().HandleClick(self.checkSelectedFileNode(self.press)) },
 		// },
 		{
 			Key:         opts.GetKey("<c-b>"), // TODO: softcode
@@ -216,12 +214,12 @@ func (self *FilesController) press(node *filetree.FileNode) error {
 		return err
 	}
 
-	return self.context.HandleFocus()
+	return self.context().HandleFocus()
 }
 
 func (self *FilesController) checkSelectedFileNode(callback func(*filetree.FileNode) error) func() error {
 	return func() error {
-		node := self.context.GetSelectedFileNode()
+		node := self.context().GetSelectedFileNode()
 		if node == nil {
 			return nil
 		}
@@ -231,11 +229,15 @@ func (self *FilesController) checkSelectedFileNode(callback func(*filetree.FileN
 }
 
 func (self *FilesController) Context() types.Context {
-	return self.context
+	return self.context()
+}
+
+func (self *FilesController) context() *context.WorkingTreeContext {
+	return self.contexts.Files
 }
 
 func (self *FilesController) getSelectedFile() *models.File {
-	node := self.context.GetSelectedFileNode()
+	node := self.context().GetSelectedFileNode()
 	if node == nil {
 		return nil
 	}
@@ -247,7 +249,7 @@ func (self *FilesController) enter() error {
 }
 
 func (self *FilesController) EnterFile(opts types.OnFocusOpts) error {
-	node := self.context.GetSelectedFileNode()
+	node := self.context().GetSelectedFileNode()
 	if node == nil {
 		return nil
 	}
@@ -523,8 +525,8 @@ func (self *FilesController) handleStatusFilterPressed() error {
 }
 
 func (self *FilesController) setStatusFiltering(filter filetree.FileTreeDisplayFilter) error {
-	self.context.FileTreeViewModel.SetFilter(filter)
-	return self.c.PostRefreshUpdate(self.context)
+	self.context().FileTreeViewModel.SetFilter(filter)
+	return self.c.PostRefreshUpdate(self.context())
 }
 
 func (self *FilesController) edit(node *filetree.FileNode) error {
@@ -536,7 +538,7 @@ func (self *FilesController) edit(node *filetree.FileNode) error {
 }
 
 func (self *FilesController) Open() error {
-	node := self.context.GetSelectedFileNode()
+	node := self.context().GetSelectedFileNode()
 	if node == nil {
 		return nil
 	}
@@ -584,12 +586,12 @@ func (self *FilesController) createResetMenu() error {
 }
 
 func (self *FilesController) handleToggleDirCollapsed() error {
-	node := self.context.GetSelectedFileNode()
+	node := self.context().GetSelectedFileNode()
 	if node == nil {
 		return nil
 	}
 
-	self.context.FileTreeViewModel.ToggleCollapsed(node.GetPath())
+	self.context().FileTreeViewModel.ToggleCollapsed(node.GetPath())
 
 	if err := self.c.PostRefreshUpdate(self.contexts.Files); err != nil {
 		self.c.Log.Error(err)
@@ -599,9 +601,9 @@ func (self *FilesController) handleToggleDirCollapsed() error {
 }
 
 func (self *FilesController) toggleTreeView() error {
-	self.context.FileTreeViewModel.ToggleShowTree()
+	self.context().FileTreeViewModel.ToggleShowTree()
 
-	return self.c.PostRefreshUpdate(self.context)
+	return self.c.PostRefreshUpdate(self.context())
 }
 
 func (self *FilesController) OpenMergeTool() error {

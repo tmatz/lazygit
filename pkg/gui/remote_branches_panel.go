@@ -101,15 +101,6 @@ func (gui *Gui) handleCreateResetToRemoteBranchMenu() error {
 	return gui.helpers.Refs.CreateGitResetMenu(selectedBranch.FullName())
 }
 
-func (gui *Gui) handleEnterRemoteBranch() error {
-	selectedBranch := gui.State.Contexts.RemoteBranches.GetSelected()
-	if selectedBranch == nil {
-		return nil
-	}
-
-	return gui.switchToSubCommitsContext(selectedBranch.RefName())
-}
-
 func (gui *Gui) handleNewBranchOffRemoteBranch() error {
 	selectedBranch := gui.State.Contexts.RemoteBranches.GetSelected()
 	if selectedBranch == nil {

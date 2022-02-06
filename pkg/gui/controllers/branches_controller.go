@@ -5,10 +5,8 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/jesseduffield/lazygit/pkg/commands"
 	"github.com/jesseduffield/lazygit/pkg/commands/git_commands"
 	"github.com/jesseduffield/lazygit/pkg/commands/models"
-	"github.com/jesseduffield/lazygit/pkg/commands/oscommands"
 	"github.com/jesseduffield/lazygit/pkg/gui/context"
 	"github.com/jesseduffield/lazygit/pkg/gui/types"
 	"github.com/jesseduffield/lazygit/pkg/utils"
@@ -16,31 +14,17 @@ import (
 
 type BranchesController struct {
 	baseController
-
-	c       *types.HelperCommon
-	context *context.BranchesContext
-	model   *types.Model
-	git     *commands.GitCommand
-	os      *oscommands.OSCommand
-	helpers *Helpers
+	*controllerCommon
 }
 
 var _ types.IController = &BranchesController{}
 
 func NewBranchesController(
-	c *types.HelperCommon,
-	context *context.BranchesContext,
-	model *types.Model,
-	git *commands.GitCommand,
-	os *oscommands.OSCommand,
+	common *controllerCommon,
 ) *BranchesController {
 	return &BranchesController{
-		baseController: baseController{},
-		c:              c,
-		context:        context,
-		model:          model,
-		git:            git,
-		os:             os,
+		baseController:   baseController{},
+		controllerCommon: common,
 	}
 }
 
@@ -64,7 +48,7 @@ func (self *BranchesController) GetKeybindings(opts types.KeybindingsOpts) []*ty
 			ViewName:    "branches",
 			Contexts:    []string{string(context.LOCAL_BRANCHES_CONTEXT_KEY)},
 			Key:         opts.GetKey(opts.Config.Branches.ViewPullRequestOptions),
-			Handler:     self.handleCreatePullRequestMenu,
+			Handler:     self.checkSelected(self.handleCreatePullRequestMenu),
 			Description: self.c.Tr.LcCreatePullRequestOptions,
 			OpensMenu:   true,
 		},
@@ -93,14 +77,14 @@ func (self *BranchesController) GetKeybindings(opts types.KeybindingsOpts) []*ty
 			ViewName:    "branches",
 			Contexts:    []string{string(context.LOCAL_BRANCHES_CONTEXT_KEY)},
 			Key:         opts.GetKey(opts.Config.Universal.New),
-			Handler:     self.handleNewBranchOffBranch,
+			Handler:     self.checkSelected(self.handleNewBranchOffBranch),
 			Description: self.c.Tr.LcNewBranch,
 		},
 		{
 			ViewName:    "branches",
 			Contexts:    []string{string(context.LOCAL_BRANCHES_CONTEXT_KEY)},
 			Key:         opts.GetKey(opts.Config.Universal.Remove),
-			Handler:     self.handleDeleteBranch,
+			Handler:     self.checkSelectedAndReal(self.handleDeleteBranch),
 			Description: self.c.Tr.LcDeleteBranch,
 		},
 		{
@@ -121,14 +105,14 @@ func (self *BranchesController) GetKeybindings(opts types.KeybindingsOpts) []*ty
 			ViewName:    "branches",
 			Contexts:    []string{string(context.LOCAL_BRANCHES_CONTEXT_KEY)},
 			Key:         opts.GetKey(opts.Config.Branches.FastForward),
-			Handler:     self.handleFastForward,
+			Handler:     self.checkSelectedAndReal(self.handleFastForward),
 			Description: self.c.Tr.FastForward,
 		},
 		{
 			ViewName:    "branches",
 			Contexts:    []string{string(context.LOCAL_BRANCHES_CONTEXT_KEY)},
 			Key:         opts.GetKey(opts.Config.Commits.ViewResetOptions),
-			Handler:     self.handleCreateResetToBranchMenu,
+			Handler:     self.checkSelected(self.handleCreateResetToBranchMenu),
 			Description: self.c.Tr.LcViewResetOptions,
 			OpensMenu:   true,
 		},
@@ -136,18 +120,22 @@ func (self *BranchesController) GetKeybindings(opts types.KeybindingsOpts) []*ty
 			ViewName:    "branches",
 			Contexts:    []string{string(context.LOCAL_BRANCHES_CONTEXT_KEY)},
 			Key:         opts.GetKey(opts.Config.Branches.RenameBranch),
-			Handler:     self.handleRenameBranch,
+			Handler:     self.checkSelectedAndReal(self.handleRenameBranch),
 			Description: self.c.Tr.LcRenameBranch,
 		},
 	}
 }
 
 func (self *BranchesController) Context() types.Context {
-	return self.context
+	return self.context()
+}
+
+func (self *BranchesController) context() *context.BranchesContext {
+	return self.contexts.Branches
 }
 
 func (self *BranchesController) handleBranchPress() error {
-	branch := self.context.GetSelected()
+	branch := self.context().GetSelected()
 	if branch == nil {
 		return nil
 	}
@@ -161,22 +149,18 @@ func (self *BranchesController) handleBranchPress() error {
 }
 
 func (self *BranchesController) handleCreatePullRequestPress() error {
-	branch := self.context.GetSelected()
+	branch := self.context().GetSelected()
 	return self.createPullRequest(branch.Name, "")
 }
 
-func (self *BranchesController) handleCreatePullRequestMenu() error {
-	selectedBranch := self.context.GetSelected()
-	if selectedBranch == nil {
-		return nil
-	}
+func (self *BranchesController) handleCreatePullRequestMenu(selectedBranch *models.Branch) error {
 	checkedOutBranch := self.helpers.Refs.GetCheckedOutRef()
 
 	return self.createPullRequestMenu(selectedBranch, checkedOutBranch)
 }
 
 func (self *BranchesController) handleCopyPullRequestURLPress() error {
-	branch := self.context.GetSelected()
+	branch := self.context().GetSelected()
 
 	branchExistsOnRemote := self.git.Remote.CheckRemoteBranchExists(branch.Name)
 
@@ -199,7 +183,7 @@ func (self *BranchesController) handleCopyPullRequestURLPress() error {
 }
 
 func (self *BranchesController) handleForceCheckout() error {
-	branch := self.context.GetSelected()
+	branch := self.context().GetSelected()
 	message := self.c.Tr.SureForceCheckout
 	title := self.c.Tr.ForceCheckoutBranch
 
@@ -238,7 +222,7 @@ func (self *BranchesController) handleCheckoutByName() error {
 }
 
 func (self *BranchesController) createNewBranchWithName(newBranchName string) error {
-	branch := self.context.GetSelected()
+	branch := self.context().GetSelected()
 	if branch == nil {
 		return nil
 	}
@@ -247,24 +231,20 @@ func (self *BranchesController) createNewBranchWithName(newBranchName string) er
 		return self.c.Error(err)
 	}
 
-	self.context.SetSelectedLineIdx(0)
+	self.context().SetSelectedLineIdx(0)
 	return self.c.Refresh(types.RefreshOptions{Mode: types.ASYNC})
 }
 
-func (self *BranchesController) handleDeleteBranch() error {
-	return self.deleteBranch(false)
+func (self *BranchesController) handleDeleteBranch(branch *models.Branch) error {
+	return self.deleteBranch(branch, false)
 }
 
-func (self *BranchesController) deleteBranch(force bool) error {
-	selectedBranch := self.context.GetSelected()
-	if selectedBranch == nil {
-		return nil
-	}
+func (self *BranchesController) deleteBranch(branch *models.Branch, force bool) error {
 	checkedOutBranch := self.helpers.Refs.GetCheckedOutRef()
-	if checkedOutBranch.Name == selectedBranch.Name {
+	if checkedOutBranch.Name == branch.Name {
 		return self.c.ErrorMsg(self.c.Tr.CantDeleteCheckOutBranch)
 	}
-	return self.deleteNamedBranch(selectedBranch, force)
+	return self.deleteNamedBranch(branch, force)
 }
 
 func (self *BranchesController) deleteNamedBranch(selectedBranch *models.Branch, force bool) error {
@@ -300,21 +280,16 @@ func (self *BranchesController) deleteNamedBranch(selectedBranch *models.Branch,
 }
 
 func (self *BranchesController) handleMerge() error {
-	selectedBranchName := self.context.GetSelected().Name
+	selectedBranchName := self.context().GetSelected().Name
 	return self.helpers.MergeAndRebase.MergeRefIntoCheckedOutBranch(selectedBranchName)
 }
 
 func (self *BranchesController) handleRebaseOntoLocalBranch() error {
-	selectedBranchName := self.context.GetSelected().Name
+	selectedBranchName := self.context().GetSelected().Name
 	return self.helpers.MergeAndRebase.RebaseOntoRef(selectedBranchName)
 }
 
-func (self *BranchesController) handleFastForward() error {
-	branch := self.context.GetSelected()
-	if branch == nil || !branch.IsRealBranch() {
-		return nil
-	}
-
+func (self *BranchesController) handleFastForward(branch *models.Branch) error {
 	if !branch.IsTrackingRemote() {
 		return self.c.ErrorMsg(self.c.Tr.FwdNoUpstream)
 	}
@@ -364,21 +339,11 @@ func (self *BranchesController) handleFastForward() error {
 	})
 }
 
-func (self *BranchesController) handleCreateResetToBranchMenu() error {
-	branch := self.context.GetSelected()
-	if branch == nil {
-		return nil
-	}
-
-	return self.helpers.Refs.CreateGitResetMenu(branch.Name)
+func (self *BranchesController) handleCreateResetToBranchMenu(selectedBranch *models.Branch) error {
+	return self.helpers.Refs.CreateGitResetMenu(selectedBranch.Name)
 }
 
-func (self *BranchesController) handleRenameBranch() error {
-	branch := self.context.GetSelected()
-	if branch == nil || !branch.IsRealBranch() {
-		return nil
-	}
-
+func (self *BranchesController) handleRenameBranch(branch *models.Branch) error {
 	promptForNewName := func() error {
 		return self.c.Prompt(types.PromptOpts{
 			Title:          self.c.Tr.NewBranchNamePrompt + " " + branch.Name + ":",
@@ -395,8 +360,8 @@ func (self *BranchesController) handleRenameBranch() error {
 				// now that we've got our stuff again we need to find that branch and reselect it.
 				for i, newBranch := range self.model.Branches {
 					if newBranch.Name == newBranchName {
-						self.context.SetSelectedLineIdx(i)
-						if err := self.context.HandleRender(); err != nil {
+						self.context().SetSelectedLineIdx(i)
+						if err := self.context().HandleRender(); err != nil {
 							return err
 						}
 					}
@@ -421,12 +386,7 @@ func (self *BranchesController) handleRenameBranch() error {
 	})
 }
 
-func (self *BranchesController) handleNewBranchOffBranch() error {
-	selectedBranch := self.context.GetSelected()
-	if selectedBranch == nil {
-		return nil
-	}
-
+func (self *BranchesController) handleNewBranchOffBranch(selectedBranch *models.Branch) error {
 	return self.helpers.Refs.NewBranch(selectedBranch.RefName(), selectedBranch.RefName(), "")
 }
 
@@ -490,4 +450,26 @@ func (self *BranchesController) createPullRequest(from string, to string) error 
 	}
 
 	return nil
+}
+
+func (self *BranchesController) checkSelected(callback func(*models.Branch) error) func() error {
+	return func() error {
+		selectedItem := self.context().GetSelected()
+		if selectedItem == nil {
+			return nil
+		}
+
+		return callback(selectedItem)
+	}
+}
+
+func (self *BranchesController) checkSelectedAndReal(callback func(*models.Branch) error) func() error {
+	return func() error {
+		selectedItem := self.context().GetSelected()
+		if selectedItem == nil || !selectedItem.IsRealBranch() {
+			return nil
+		}
+
+		return callback(selectedItem)
+	}
 }

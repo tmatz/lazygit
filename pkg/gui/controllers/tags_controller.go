@@ -10,7 +10,6 @@ import (
 type TagsController struct {
 	baseController
 	*controllerCommon
-	context *context.TagsContext
 }
 
 var _ types.IController = &TagsController{}
@@ -21,7 +20,6 @@ func NewTagsController(
 	return &TagsController{
 		baseController:   baseController{},
 		controllerCommon: common,
-		context:          common.contexts.Tags,
 	}
 }
 
@@ -119,12 +117,12 @@ func (self *TagsController) createResetMenu(tag *models.Tag) error {
 
 func (self *TagsController) create() error {
 	// leaving commit SHA blank so that we're just creating the tag for the current commit
-	return self.helpers.Tags.CreateTagMenu("", func() { self.context.SetSelectedLineIdx(0) })
+	return self.helpers.Tags.CreateTagMenu("", func() { self.context().SetSelectedLineIdx(0) })
 }
 
 func (self *TagsController) withSelectedTag(f func(tag *models.Tag) error) func() error {
 	return func() error {
-		tag := self.context.GetSelected()
+		tag := self.context().GetSelected()
 		if tag == nil {
 			return nil
 		}
@@ -134,5 +132,9 @@ func (self *TagsController) withSelectedTag(f func(tag *models.Tag) error) func(
 }
 
 func (self *TagsController) Context() types.Context {
-	return self.context
+	return self.context()
+}
+
+func (self *TagsController) context() *context.TagsContext {
+	return self.contexts.Tags
 }
