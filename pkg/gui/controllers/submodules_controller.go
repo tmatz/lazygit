@@ -227,7 +227,7 @@ func (self *SubmodulesController) remove(submodule *models.SubmoduleConfig) erro
 
 func (self *SubmodulesController) checkSelected(callback func(*models.SubmoduleConfig) error) func() error {
 	return func() error {
-		submodule := self.context.GetSelectedSubmodule()
+		submodule := self.context.GetSelected()
 		if submodule == nil {
 			return nil
 		}

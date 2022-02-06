@@ -484,7 +484,7 @@ func (gui *Gui) refreshReflogCommits() error {
 }
 
 func (gui *Gui) refreshRemotes() error {
-	prevSelectedRemote := gui.State.Contexts.Remotes.GetSelectedRemote()
+	prevSelectedRemote := gui.State.Contexts.Remotes.GetSelected()
 
 	remotes, err := gui.git.Loaders.Remotes.GetRemotes()
 	if err != nil {

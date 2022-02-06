@@ -49,7 +49,7 @@ func NewSuggestionsContext(
 }
 
 func (self *SuggestionsContext) GetSelectedItemId() string {
-	item := self.GetSelectedSuggestion()
+	item := self.GetSelected()
 	if item == nil {
 		return ""
 	}
@@ -76,7 +76,7 @@ func (self *SuggestionsViewModel) GetItemsLength() int {
 	return len(self.getModel())
 }
 
-func (self *SuggestionsViewModel) GetSelectedSuggestion() *types.Suggestion {
+func (self *SuggestionsViewModel) GetSelected() *types.Suggestion {
 	if self.GetItemsLength() == 0 {
 		return nil
 	}

@@ -242,7 +242,7 @@ func (self *BisectController) selectCurrentBisectCommit() {
 
 func (self *BisectController) checkSelected(callback func(*models.Commit) error) func() error {
 	return func() error {
-		commit := self.context.GetSelectedCommit()
+		commit := self.context.GetSelected()
 		if commit == nil {
 			return nil
 		}

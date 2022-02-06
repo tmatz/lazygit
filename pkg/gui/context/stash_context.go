@@ -50,7 +50,7 @@ func NewStashContext(
 }
 
 func (self *StashContext) GetSelectedItemId() string {
-	item := self.GetSelectedStashEntry()
+	item := self.GetSelected()
 	if item == nil {
 		return ""
 	}
@@ -77,7 +77,7 @@ func (self *StashViewModel) GetItemsLength() int {
 	return len(self.getModel())
 }
 
-func (self *StashViewModel) GetSelectedStashEntry() *models.StashEntry {
+func (self *StashViewModel) GetSelected() *models.StashEntry {
 	if self.GetItemsLength() == 0 {
 		return nil
 	}

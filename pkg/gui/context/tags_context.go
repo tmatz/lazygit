@@ -50,7 +50,7 @@ func NewTagsContext(
 }
 
 func (self *TagsContext) GetSelectedItemId() string {
-	item := self.GetSelectedTag()
+	item := self.GetSelected()
 	if item == nil {
 		return ""
 	}
@@ -77,7 +77,7 @@ func (self *TagsViewModel) GetItemsLength() int {
 	return len(self.getModel())
 }
 
-func (self *TagsViewModel) GetSelectedTag() *models.Tag {
+func (self *TagsViewModel) GetSelected() *models.Tag {
 	if self.GetItemsLength() == 0 {
 		return nil
 	}

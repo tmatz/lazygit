@@ -50,7 +50,7 @@ func NewMenuContext(
 
 // TODO: remove this thing.
 func (self *MenuContext) GetSelectedItemId() string {
-	item := self.GetSelectedMenuItem()
+	item := self.GetSelected()
 	if item == nil {
 		return ""
 	}
@@ -77,7 +77,7 @@ func (self *MenuViewModel) GetItemsLength() int {
 	return len(self.menuItems)
 }
 
-func (self *MenuViewModel) GetSelectedMenuItem() *types.MenuItem {
+func (self *MenuViewModel) GetSelected() *types.MenuItem {
 	if self.GetItemsLength() == 0 {
 		return nil
 	}

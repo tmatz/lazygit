@@ -51,7 +51,7 @@ func NewLocalCommitsContext(
 }
 
 func (self *LocalCommitsContext) GetSelectedItemId() string {
-	item := self.GetSelectedCommit()
+	item := self.GetSelected()
 	if item == nil {
 		return ""
 	}
@@ -78,7 +78,7 @@ func (self *LocalCommitsViewModel) GetItemsLength() int {
 	return len(self.getModel())
 }
 
-func (self *LocalCommitsViewModel) GetSelectedCommit() *models.Commit {
+func (self *LocalCommitsViewModel) GetSelected() *models.Commit {
 	if self.GetItemsLength() == 0 {
 		return nil
 	}

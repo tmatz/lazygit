@@ -115,7 +115,7 @@ func (gui *Gui) branchCommitsListContext() *context.LocalCommitsContext {
 		func(startIdx int, length int) [][]string {
 			selectedCommitSha := ""
 			if gui.currentContext().GetKey() == context.BRANCH_COMMITS_CONTEXT_KEY {
-				selectedCommit := gui.State.Contexts.BranchCommits.GetSelectedCommit()
+				selectedCommit := gui.State.Contexts.BranchCommits.GetSelected()
 				if selectedCommit != nil {
 					selectedCommitSha = selectedCommit.Sha
 				}
@@ -147,7 +147,7 @@ func (gui *Gui) subCommitsListContext() *context.SubCommitsContext {
 		func(startIdx int, length int) [][]string {
 			selectedCommitSha := ""
 			if gui.currentContext().GetKey() == context.SUB_COMMITS_CONTEXT_KEY {
-				selectedCommit := gui.State.Contexts.SubCommits.GetSelectedCommit()
+				selectedCommit := gui.State.Contexts.SubCommits.GetSelected()
 				if selectedCommit != nil {
 					selectedCommitSha = selectedCommit.Sha
 				}

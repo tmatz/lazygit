@@ -12,7 +12,7 @@ import (
 
 func (gui *Gui) remoteBranchesRenderToMain() error {
 	var task updateTask
-	remoteBranch := gui.State.Contexts.RemoteBranches.GetSelectedRemoteBranch()
+	remoteBranch := gui.State.Contexts.RemoteBranches.GetSelected()
 	if remoteBranch == nil {
 		task = NewRenderStringTask("No branches for this remote")
 	} else {
@@ -33,12 +33,12 @@ func (gui *Gui) handleRemoteBranchesEscape() error {
 }
 
 func (gui *Gui) handleMergeRemoteBranch() error {
-	selectedBranchName := gui.State.Contexts.RemoteBranches.GetSelectedRemoteBranch().FullName()
+	selectedBranchName := gui.State.Contexts.RemoteBranches.GetSelected().FullName()
 	return gui.mergeBranchIntoCheckedOutBranch(selectedBranchName)
 }
 
 func (gui *Gui) handleDeleteRemoteBranch() error {
-	remoteBranch := gui.State.Contexts.RemoteBranches.GetSelectedRemoteBranch()
+	remoteBranch := gui.State.Contexts.RemoteBranches.GetSelected()
 	if remoteBranch == nil {
 		return nil
 	}
@@ -62,12 +62,12 @@ func (gui *Gui) handleDeleteRemoteBranch() error {
 }
 
 func (gui *Gui) handleRebaseOntoRemoteBranch() error {
-	selectedBranchName := gui.State.Contexts.RemoteBranches.GetSelectedRemoteBranch().FullName()
+	selectedBranchName := gui.State.Contexts.RemoteBranches.GetSelected().FullName()
 	return gui.handleRebaseOntoBranch(selectedBranchName)
 }
 
 func (gui *Gui) handleSetBranchUpstream() error {
-	selectedBranch := gui.State.Contexts.RemoteBranches.GetSelectedRemoteBranch()
+	selectedBranch := gui.State.Contexts.RemoteBranches.GetSelected()
 	checkedOutBranch := gui.getCheckedOutBranch()
 
 	message := utils.ResolvePlaceholderString(
@@ -93,7 +93,7 @@ func (gui *Gui) handleSetBranchUpstream() error {
 }
 
 func (gui *Gui) handleCreateResetToRemoteBranchMenu() error {
-	selectedBranch := gui.State.Contexts.RemoteBranches.GetSelectedRemoteBranch()
+	selectedBranch := gui.State.Contexts.RemoteBranches.GetSelected()
 	if selectedBranch == nil {
 		return nil
 	}
@@ -102,7 +102,7 @@ func (gui *Gui) handleCreateResetToRemoteBranchMenu() error {
 }
 
 func (gui *Gui) handleEnterRemoteBranch() error {
-	selectedBranch := gui.State.Contexts.RemoteBranches.GetSelectedRemoteBranch()
+	selectedBranch := gui.State.Contexts.RemoteBranches.GetSelected()
 	if selectedBranch == nil {
 		return nil
 	}
@@ -111,7 +111,7 @@ func (gui *Gui) handleEnterRemoteBranch() error {
 }
 
 func (gui *Gui) handleNewBranchOffRemoteBranch() error {
-	selectedBranch := gui.State.Contexts.RemoteBranches.GetSelectedRemoteBranch()
+	selectedBranch := gui.State.Contexts.RemoteBranches.GetSelected()
 	if selectedBranch == nil {
 		return nil
 	}

@@ -15,7 +15,7 @@ func (gui *Gui) getSelectedSuggestionValue() string {
 }
 
 func (gui *Gui) getSelectedSuggestion() *types.Suggestion {
-	return gui.State.Contexts.Suggestions.GetSelectedSuggestion()
+	return gui.State.Contexts.Suggestions.GetSelected()
 }
 
 func (gui *Gui) setSuggestions(suggestions []*types.Suggestion) {

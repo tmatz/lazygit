@@ -50,7 +50,7 @@ func NewRemotesContext(
 }
 
 func (self *RemotesContext) GetSelectedItemId() string {
-	item := self.GetSelectedRemote()
+	item := self.GetSelected()
 	if item == nil {
 		return ""
 	}
@@ -77,7 +77,7 @@ func (self *RemotesViewModel) GetItemsLength() int {
 	return len(self.getModel())
 }
 
-func (self *RemotesViewModel) GetSelectedRemote() *models.Remote {
+func (self *RemotesViewModel) GetSelected() *models.Remote {
 	if self.GetItemsLength() == 0 {
 		return nil
 	}

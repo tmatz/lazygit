@@ -9,11 +9,11 @@ import (
 // list panel functions
 
 func (gui *Gui) getSelectedReflogCommit() *models.Commit {
-	return gui.State.Contexts.ReflogCommits.GetSelectedReflogCommit()
+	return gui.State.Contexts.ReflogCommits.GetSelected()
 }
 
 func (gui *Gui) reflogCommitsRenderToMain() error {
-	commit := gui.State.Contexts.ReflogCommits.GetSelectedReflogCommit()
+	commit := gui.State.Contexts.ReflogCommits.GetSelected()
 	var task updateTask
 	if commit == nil {
 		task = NewRenderStringTask("No reflog history")
@@ -32,7 +32,7 @@ func (gui *Gui) reflogCommitsRenderToMain() error {
 }
 
 func (gui *Gui) CheckoutReflogCommit() error {
-	commit := gui.State.Contexts.ReflogCommits.GetSelectedReflogCommit()
+	commit := gui.State.Contexts.ReflogCommits.GetSelected()
 	if commit == nil {
 		return nil
 	}
@@ -53,13 +53,13 @@ func (gui *Gui) CheckoutReflogCommit() error {
 }
 
 func (gui *Gui) handleCreateReflogResetMenu() error {
-	commit := gui.State.Contexts.ReflogCommits.GetSelectedReflogCommit()
+	commit := gui.State.Contexts.ReflogCommits.GetSelected()
 
 	return gui.helpers.Refs.CreateGitResetMenu(commit.Sha)
 }
 
 func (gui *Gui) handleViewReflogCommitFiles() error {
-	commit := gui.State.Contexts.ReflogCommits.GetSelectedReflogCommit()
+	commit := gui.State.Contexts.ReflogCommits.GetSelected()
 	if commit == nil {
 		return nil
 	}
@@ -73,7 +73,7 @@ func (gui *Gui) handleViewReflogCommitFiles() error {
 }
 
 func (gui *Gui) handleCopyReflogCommit() error {
-	commit := gui.State.Contexts.ReflogCommits.GetSelectedReflogCommit()
+	commit := gui.State.Contexts.ReflogCommits.GetSelected()
 	if commit == nil {
 		return nil
 	}
@@ -83,7 +83,7 @@ func (gui *Gui) handleCopyReflogCommit() error {
 
 func (gui *Gui) handleCopyReflogCommitRange() error {
 	// just doing this to ensure something is selected
-	commit := gui.State.Contexts.ReflogCommits.GetSelectedReflogCommit()
+	commit := gui.State.Contexts.ReflogCommits.GetSelected()
 	if commit == nil {
 		return nil
 	}

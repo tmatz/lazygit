@@ -9,7 +9,7 @@ import (
 // list panel functions
 
 func (gui *Gui) getSelectedStashEntry() *models.StashEntry {
-	return gui.State.Contexts.Stash.GetSelectedStashEntry()
+	return gui.State.Contexts.Stash.GetSelected()
 }
 
 func (gui *Gui) stashRenderToMain() error {

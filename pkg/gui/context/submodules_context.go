@@ -50,7 +50,7 @@ func NewSubmodulesContext(
 }
 
 func (self *SubmodulesContext) GetSelectedItemId() string {
-	item := self.GetSelectedSubmodule()
+	item := self.GetSelected()
 	if item == nil {
 		return ""
 	}
@@ -77,7 +77,7 @@ func (self *SubmodulesViewModel) GetItemsLength() int {
 	return len(self.getModel())
 }
 
-func (self *SubmodulesViewModel) GetSelectedSubmodule() *models.SubmoduleConfig {
+func (self *SubmodulesViewModel) GetSelected() *models.SubmoduleConfig {
 	if self.GetItemsLength() == 0 {
 		return nil
 	}

@@ -9,7 +9,7 @@ import (
 // list panel functions
 
 func (gui *Gui) subCommitsRenderToMain() error {
-	commit := gui.State.Contexts.SubCommits.GetSelectedCommit()
+	commit := gui.State.Contexts.SubCommits.GetSelected()
 	var task updateTask
 	if commit == nil {
 		task = NewRenderStringTask("No commits")
@@ -28,7 +28,7 @@ func (gui *Gui) subCommitsRenderToMain() error {
 }
 
 func (gui *Gui) handleCheckoutSubCommit() error {
-	commit := gui.State.Contexts.SubCommits.GetSelectedCommit()
+	commit := gui.State.Contexts.SubCommits.GetSelected()
 	if commit == nil {
 		return nil
 	}
@@ -51,13 +51,13 @@ func (gui *Gui) handleCheckoutSubCommit() error {
 }
 
 func (gui *Gui) handleCreateSubCommitResetMenu() error {
-	commit := gui.State.Contexts.SubCommits.GetSelectedCommit()
+	commit := gui.State.Contexts.SubCommits.GetSelected()
 
 	return gui.helpers.Refs.CreateGitResetMenu(commit.Sha)
 }
 
 func (gui *Gui) handleViewSubCommitFiles() error {
-	commit := gui.State.Contexts.SubCommits.GetSelectedCommit()
+	commit := gui.State.Contexts.SubCommits.GetSelected()
 	if commit == nil {
 		return nil
 	}
@@ -92,7 +92,7 @@ func (gui *Gui) switchToSubCommitsContext(refName string) error {
 }
 
 func (gui *Gui) handleNewBranchOffSubCommit() error {
-	commit := gui.State.Contexts.SubCommits.GetSelectedCommit()
+	commit := gui.State.Contexts.SubCommits.GetSelected()
 	if commit == nil {
 		return nil
 	}
@@ -101,7 +101,7 @@ func (gui *Gui) handleNewBranchOffSubCommit() error {
 }
 
 func (gui *Gui) handleCopySubCommit() error {
-	commit := gui.State.Contexts.SubCommits.GetSelectedCommit()
+	commit := gui.State.Contexts.SubCommits.GetSelected()
 	if commit == nil {
 		return nil
 	}
@@ -111,7 +111,7 @@ func (gui *Gui) handleCopySubCommit() error {
 
 func (gui *Gui) handleCopySubCommitRange() error {
 	// just doing this to ensure something is selected
-	commit := gui.State.Contexts.SubCommits.GetSelectedCommit()
+	commit := gui.State.Contexts.SubCommits.GetSelected()
 	if commit == nil {
 		return nil
 	}

@@ -51,7 +51,7 @@ func NewSubCommitsContext(
 }
 
 func (self *SubCommitsContext) GetSelectedItemId() string {
-	item := self.GetSelectedCommit()
+	item := self.GetSelected()
 	if item == nil {
 		return ""
 	}
@@ -78,7 +78,7 @@ func (self *SubCommitsViewModel) GetItemsLength() int {
 	return len(self.getModel())
 }
 
-func (self *SubCommitsViewModel) GetSelectedCommit() *models.Commit {
+func (self *SubCommitsViewModel) GetSelected() *models.Commit {
 	if self.GetItemsLength() == 0 {
 		return nil
 	}

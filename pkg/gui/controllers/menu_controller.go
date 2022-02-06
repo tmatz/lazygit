@@ -50,7 +50,7 @@ func (self *MenuController) GetKeybindings(opts types.KeybindingsOpts) []*types.
 }
 
 func (self *MenuController) press() error {
-	selectedItem := self.context.GetSelectedMenuItem()
+	selectedItem := self.context.GetSelected()
 
 	if err := self.c.PopContext(); err != nil {
 		return err

@@ -179,7 +179,7 @@ func (self *RemotesController) fetch(remote *models.Remote) error {
 
 func (self *RemotesController) checkSelected(callback func(*models.Remote) error) func() error {
 	return func() error {
-		file := self.context.GetSelectedRemote()
+		file := self.context.GetSelected()
 		if file == nil {
 			return nil
 		}

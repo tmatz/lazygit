@@ -11,7 +11,7 @@ const COMMIT_THRESHOLD = 200
 // list panel functions
 
 func (gui *Gui) getSelectedLocalCommit() *models.Commit {
-	return gui.State.Contexts.BranchCommits.GetSelectedCommit()
+	return gui.State.Contexts.BranchCommits.GetSelected()
 }
 
 func (gui *Gui) onCommitFocus() error {
@@ -31,7 +31,7 @@ func (gui *Gui) onCommitFocus() error {
 
 func (gui *Gui) branchCommitsRenderToMain() error {
 	var task updateTask
-	commit := gui.State.Contexts.BranchCommits.GetSelectedCommit()
+	commit := gui.State.Contexts.BranchCommits.GetSelected()
 	if commit == nil {
 		task = NewRenderStringTask(gui.c.Tr.NoCommitsThisBranch)
 	} else {

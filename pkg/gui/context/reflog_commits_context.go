@@ -50,7 +50,7 @@ func NewReflogCommitsContext(
 }
 
 func (self *ReflogCommitsContext) GetSelectedItemId() string {
-	item := self.GetSelectedReflogCommit()
+	item := self.GetSelected()
 	if item == nil {
 		return ""
 	}
@@ -77,7 +77,7 @@ func (self *ReflogCommitsViewModel) GetItemsLength() int {
 	return len(self.getModel())
 }
 
-func (self *ReflogCommitsViewModel) GetSelectedReflogCommit() *models.Commit {
+func (self *ReflogCommitsViewModel) GetSelected() *models.Commit {
 	if self.GetItemsLength() == 0 {
 		return nil
 	}

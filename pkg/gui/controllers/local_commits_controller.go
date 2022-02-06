@@ -402,7 +402,7 @@ func (self *LocalCommitsController) interactiveRebase(action string) error {
 // commit meaning you are trying to edit the todo file rather than actually
 // begin a rebase. It then updates the todo file with that action
 func (self *LocalCommitsController) handleMidRebaseCommand(action string) (bool, error) {
-	selectedCommit := self.context.GetSelectedCommit()
+	selectedCommit := self.context.GetSelected()
 	if selectedCommit.Status != "rebasing" {
 		return false, nil
 	}
@@ -507,7 +507,7 @@ func (self *LocalCommitsController) handleCommitAmendTo() error {
 		HandleConfirm: func() error {
 			return self.c.WithWaitingStatus(self.c.Tr.AmendingStatus, func() error {
 				self.c.LogAction(self.c.Tr.Actions.AmendCommit)
-				err := self.git.Rebase.AmendTo(self.context.GetSelectedCommit().Sha)
+				err := self.git.Rebase.AmendTo(self.context.GetSelected().Sha)
 				return self.CheckMergeOrRebase(err)
 			})
 		},
@@ -784,7 +784,7 @@ func (self *LocalCommitsController) handleOpenCommitInBrowser(commit *models.Com
 
 func (self *LocalCommitsController) checkSelected(callback func(*models.Commit) error) func() error {
 	return func() error {
-		commit := self.context.GetSelectedCommit()
+		commit := self.context.GetSelected()
 		if commit == nil {
 			return nil
 		}

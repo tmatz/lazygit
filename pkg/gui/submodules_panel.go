@@ -10,7 +10,7 @@ import (
 
 func (gui *Gui) submodulesRenderToMain() error {
 	var task updateTask
-	submodule := gui.State.Contexts.Submodules.GetSelectedSubmodule()
+	submodule := gui.State.Contexts.Submodules.GetSelected()
 	if submodule == nil {
 		task = NewRenderStringTask("No submodules")
 	} else {

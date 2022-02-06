@@ -11,7 +11,7 @@ import (
 
 func (gui *Gui) remotesRenderToMain() error {
 	var task updateTask
-	remote := gui.State.Contexts.Remotes.GetSelectedRemote()
+	remote := gui.State.Contexts.Remotes.GetSelected()
 	if remote == nil {
 		task = NewRenderStringTask("No remotes")
 	} else {

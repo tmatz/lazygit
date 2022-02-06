@@ -50,7 +50,7 @@ func NewRemoteBranchesContext(
 }
 
 func (self *RemoteBranchesContext) GetSelectedItemId() string {
-	item := self.GetSelectedRemoteBranch()
+	item := self.GetSelected()
 	if item == nil {
 		return ""
 	}
@@ -77,7 +77,7 @@ func (self *RemoteBranchesViewModel) GetItemsLength() int {
 	return len(self.getModel())
 }
 
-func (self *RemoteBranchesViewModel) GetSelectedRemoteBranch() *models.RemoteBranch {
+func (self *RemoteBranchesViewModel) GetSelected() *models.RemoteBranch {
 	if self.GetItemsLength() == 0 {
 		return nil
 	}

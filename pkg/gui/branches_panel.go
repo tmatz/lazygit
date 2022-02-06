@@ -15,7 +15,7 @@ import (
 
 func (gui *Gui) branchesRenderToMain() error {
 	var task updateTask
-	branch := gui.State.Contexts.Branches.GetSelectedBranch()
+	branch := gui.State.Contexts.Branches.GetSelected()
 	if branch == nil {
 		task = NewRenderStringTask(gui.c.Tr.NoBranchesThisRepo)
 	} else {
@@ -35,7 +35,7 @@ func (gui *Gui) branchesRenderToMain() error {
 // specific functions
 
 func (gui *Gui) handleBranchPress() error {
-	branch := gui.State.Contexts.Branches.GetSelectedBranch()
+	branch := gui.State.Contexts.Branches.GetSelected()
 	if branch == nil {
 		return nil
 	}
@@ -49,12 +49,12 @@ func (gui *Gui) handleBranchPress() error {
 }
 
 func (gui *Gui) handleCreatePullRequestPress() error {
-	branch := gui.State.Contexts.Branches.GetSelectedBranch()
+	branch := gui.State.Contexts.Branches.GetSelected()
 	return gui.createPullRequest(branch.Name, "")
 }
 
 func (gui *Gui) handleCreatePullRequestMenu() error {
-	selectedBranch := gui.State.Contexts.Branches.GetSelectedBranch()
+	selectedBranch := gui.State.Contexts.Branches.GetSelected()
 	if selectedBranch == nil {
 		return nil
 	}
@@ -66,7 +66,7 @@ func (gui *Gui) handleCreatePullRequestMenu() error {
 func (gui *Gui) handleCopyPullRequestURLPress() error {
 	hostingServiceMgr := gui.getHostingServiceMgr()
 
-	branch := gui.State.Contexts.Branches.GetSelectedBranch()
+	branch := gui.State.Contexts.Branches.GetSelected()
 
 	branchExistsOnRemote := gui.git.Remote.CheckRemoteBranchExists(branch.Name)
 
@@ -98,7 +98,7 @@ func (gui *Gui) handleGitFetch() error {
 }
 
 func (gui *Gui) handleForceCheckout() error {
-	branch := gui.State.Contexts.Branches.GetSelectedBranch()
+	branch := gui.State.Contexts.Branches.GetSelected()
 	message := gui.c.Tr.SureForceCheckout
 	title := gui.c.Tr.ForceCheckoutBranch
 
@@ -145,7 +145,7 @@ func (gui *Gui) getCheckedOutBranch() *models.Branch {
 }
 
 func (gui *Gui) createNewBranchWithName(newBranchName string) error {
-	branch := gui.State.Contexts.Branches.GetSelectedBranch()
+	branch := gui.State.Contexts.Branches.GetSelected()
 	if branch == nil {
 		return nil
 	}
@@ -163,7 +163,7 @@ func (gui *Gui) handleDeleteBranch() error {
 }
 
 func (gui *Gui) deleteBranch(force bool) error {
-	selectedBranch := gui.State.Contexts.Branches.GetSelectedBranch()
+	selectedBranch := gui.State.Contexts.Branches.GetSelected()
 	if selectedBranch == nil {
 		return nil
 	}
@@ -234,12 +234,12 @@ func (gui *Gui) mergeBranchIntoCheckedOutBranch(branchName string) error {
 }
 
 func (gui *Gui) handleMerge() error {
-	selectedBranchName := gui.State.Contexts.Branches.GetSelectedBranch().Name
+	selectedBranchName := gui.State.Contexts.Branches.GetSelected().Name
 	return gui.mergeBranchIntoCheckedOutBranch(selectedBranchName)
 }
 
 func (gui *Gui) handleRebaseOntoLocalBranch() error {
-	selectedBranchName := gui.State.Contexts.Branches.GetSelectedBranch().Name
+	selectedBranchName := gui.State.Contexts.Branches.GetSelected().Name
 	return gui.handleRebaseOntoBranch(selectedBranchName)
 }
 
@@ -268,7 +268,7 @@ func (gui *Gui) handleRebaseOntoBranch(selectedBranchName string) error {
 }
 
 func (gui *Gui) handleFastForward() error {
-	branch := gui.State.Contexts.Branches.GetSelectedBranch()
+	branch := gui.State.Contexts.Branches.GetSelected()
 	if branch == nil || !branch.IsRealBranch() {
 		return nil
 	}
@@ -323,7 +323,7 @@ func (gui *Gui) handleFastForward() error {
 }
 
 func (gui *Gui) handleCreateResetToBranchMenu() error {
-	branch := gui.State.Contexts.Branches.GetSelectedBranch()
+	branch := gui.State.Contexts.Branches.GetSelected()
 	if branch == nil {
 		return nil
 	}
@@ -332,7 +332,7 @@ func (gui *Gui) handleCreateResetToBranchMenu() error {
 }
 
 func (gui *Gui) handleRenameBranch() error {
-	branch := gui.State.Contexts.Branches.GetSelectedBranch()
+	branch := gui.State.Contexts.Branches.GetSelected()
 	if branch == nil || !branch.IsRealBranch() {
 		return nil
 	}
@@ -380,7 +380,7 @@ func (gui *Gui) handleRenameBranch() error {
 }
 
 func (gui *Gui) handleEnterBranch() error {
-	branch := gui.State.Contexts.Branches.GetSelectedBranch()
+	branch := gui.State.Contexts.Branches.GetSelected()
 	if branch == nil {
 		return nil
 	}
@@ -389,7 +389,7 @@ func (gui *Gui) handleEnterBranch() error {
 }
 
 func (gui *Gui) handleNewBranchOffBranch() error {
-	selectedBranch := gui.State.Contexts.Branches.GetSelectedBranch()
+	selectedBranch := gui.State.Contexts.Branches.GetSelected()
 	if selectedBranch == nil {
 		return nil
 	}
