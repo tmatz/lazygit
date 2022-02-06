@@ -53,7 +53,7 @@ func (gui *Gui) resolveTemplate(templateStr string, promptResponses []string) (s
 		SelectedStashEntry:     gui.getSelectedStashEntry(),
 		SelectedCommitFile:     gui.getSelectedCommitFile(),
 		SelectedCommitFilePath: gui.getSelectedCommitFilePath(),
-		SelectedSubCommit:      gui.getSelectedSubCommit(),
+		SelectedSubCommit:      gui.State.Contexts.SubCommits.GetSelectedCommit(),
 		CheckedOutBranch:       gui.getCheckedOutBranch(),
 		PromptResponses:        promptResponses,
 	}

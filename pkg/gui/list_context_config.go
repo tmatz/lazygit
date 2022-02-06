@@ -140,24 +140,14 @@ func (gui *Gui) branchCommitsListContext() *context.LocalCommitsContext {
 	)
 }
 
-func (gui *Gui) subCommitsListContext() types.IListContext {
-	parseEmoji := gui.c.UserConfig.Git.ParseEmoji
-	return (&ListContext{
-		BaseContext: context.NewBaseContext(context.NewBaseContextOpts{
-			ViewName:   "branches",
-			WindowName: "branches",
-			Key:        context.SUB_COMMITS_CONTEXT_KEY,
-			Kind:       types.SIDE_CONTEXT,
-			Focusable:  true,
-		}),
-		GetItemsLength:  func() int { return len(gui.State.Model.SubCommits) },
-		OnGetPanelState: func() types.IListPanelState { return gui.State.Panels.SubCommits },
-		OnRenderToMain:  OnFocusWrapper(gui.withDiffModeCheck(gui.subCommitsRenderToMain)),
-		Gui:             gui,
-		GetDisplayStrings: func(startIdx int, length int) [][]string {
+func (gui *Gui) subCommitsListContext() *context.SubCommitsContext {
+	return context.NewSubCommitsContext(
+		func() []*models.Commit { return gui.State.Model.SubCommits },
+		gui.Views.Branches,
+		func(startIdx int, length int) [][]string {
 			selectedCommitSha := ""
 			if gui.currentContext().GetKey() == context.SUB_COMMITS_CONTEXT_KEY {
-				selectedCommit := gui.getSelectedSubCommit()
+				selectedCommit := gui.State.Contexts.SubCommits.GetSelectedCommit()
 				if selectedCommit != nil {
 					selectedCommitSha = selectedCommit.Sha
 				}
@@ -167,7 +157,7 @@ func (gui *Gui) subCommitsListContext() types.IListContext {
 				gui.State.ScreenMode != SCREEN_NORMAL,
 				gui.helpers.CherryPick.CherryPickedCommitShaMap(),
 				gui.State.Modes.Diffing.Ref,
-				parseEmoji,
+				gui.c.UserConfig.Git.ParseEmoji,
 				selectedCommitSha,
 				startIdx,
 				length,
@@ -175,15 +165,11 @@ func (gui *Gui) subCommitsListContext() types.IListContext {
 				git_commands.NewNullBisectInfo(),
 			)
 		},
-		OnGetSelectedItemId: func() string {
-			item := gui.getSelectedSubCommit()
-			if item == nil {
-				return ""
-			}
-			return item.ID()
-		},
-		RenderSelection: true,
-	}).attachKeybindings()
+		nil,
+		OnFocusWrapper(gui.withDiffModeCheck(gui.subCommitsRenderToMain)),
+		nil,
+		gui.c,
+	)
 }
 
 func (gui *Gui) shouldShowGraph() bool {
