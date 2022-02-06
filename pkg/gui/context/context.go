@@ -1,6 +1,10 @@
 package context
 
-import "github.com/jesseduffield/lazygit/pkg/gui/types"
+import (
+	"sync"
+
+	"github.com/jesseduffield/lazygit/pkg/gui/types"
+)
 
 const (
 	GLOBAL_CONTEXT_KEY              types.ContextKey = "global"
@@ -113,6 +117,7 @@ func (self *ContextTree) Flatten() []types.Context {
 
 type ViewContextMap struct {
 	content map[string]types.Context
+	sync.RWMutex
 }
 
 func NewViewContextMap() *ViewContextMap {
@@ -120,10 +125,15 @@ func NewViewContextMap() *ViewContextMap {
 }
 
 func (self *ViewContextMap) Get(viewName string) types.Context {
+	self.RLock()
+	defer self.RUnlock()
+
 	return self.content[viewName]
 }
 
 func (self *ViewContextMap) Set(viewName string, context types.Context) {
+	self.Lock()
+	defer self.Unlock()
 	self.content[viewName] = context
 }
 
