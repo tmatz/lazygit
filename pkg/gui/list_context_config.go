@@ -263,22 +263,18 @@ func (gui *Gui) submodulesListContext() *context.SubmodulesContext {
 	)
 }
 
-func (gui *Gui) suggestionsListContext() types.IListContext {
-	return (&ListContext{
-		BaseContext: context.NewBaseContext(context.NewBaseContextOpts{
-			ViewName:   "suggestions",
-			WindowName: "suggestions",
-			Key:        context.SUGGESTIONS_CONTEXT_KEY,
-			Kind:       types.PERSISTENT_POPUP,
-			Focusable:  true,
-		}),
-		GetItemsLength:  func() int { return len(gui.State.Suggestions) },
-		OnGetPanelState: func() types.IListPanelState { return gui.State.Panels.Suggestions },
-		Gui:             gui,
-		GetDisplayStrings: func(startIdx int, length int) [][]string {
+func (gui *Gui) suggestionsListContext() *context.SuggestionsContext {
+	return context.NewSuggestionsContext(
+		func() []*types.Suggestion { return gui.State.Suggestions },
+		gui.Views.Files,
+		func(startIdx int, length int) [][]string {
 			return presentation.GetSuggestionListDisplayStrings(gui.State.Suggestions)
 		},
-	}).attachKeybindings()
+		nil,
+		nil,
+		nil,
+		gui.c,
+	)
 }
 
 func (gui *Gui) getListContexts() []types.IListContext {

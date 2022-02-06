@@ -75,7 +75,7 @@ type ContextTree struct {
 	ReflogCommits  *ReflogCommitsContext
 	SubCommits     *SubCommitsContext
 	Stash          *StashContext
-	Suggestions    types.IListContext
+	Suggestions    *SuggestionsContext
 	Normal         types.Context
 	Staging        types.Context
 	PatchBuilding  types.Context

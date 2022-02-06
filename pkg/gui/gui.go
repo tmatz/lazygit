@@ -245,16 +245,11 @@ type MergingPanelState struct {
 	UserVerticalScrolling bool
 }
 
-type suggestionsPanelState struct {
-	listPanelState
-}
-
 // as we move things to the new context approach we're going to eventually
 // remove this struct altogether and store this state on the contexts.
 type panelStates struct {
-	LineByLine  *LblPanelState
-	Merging     *MergingPanelState
-	Suggestions *suggestionsPanelState
+	LineByLine *LblPanelState
+	Merging    *MergingPanelState
 }
 
 type Views struct {
@@ -389,8 +384,6 @@ func (gui *Gui) resetState(filterPath string, reuseState bool) {
 		},
 
 		Panels: &panelStates{
-			// TODO: work out why some of these are -1 and some are 0. Last time I checked there was a good reason but I'm less certain now
-			Suggestions: &suggestionsPanelState{listPanelState: listPanelState{SelectedLineIdx: 0}},
 			Merging: &MergingPanelState{
 				State:                 mergeconflicts.NewState(),
 				UserVerticalScrolling: false,
