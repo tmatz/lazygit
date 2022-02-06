@@ -64,14 +64,14 @@ type ContextTree struct {
 	Global         types.Context
 	Status         types.Context
 	Files          *WorkingTreeContext
-	Submodules     types.IListContext
 	Menu           *MenuContext
 	Branches       *BranchesContext
-	Remotes        types.IListContext
-	RemoteBranches types.IListContext
 	Tags           *TagsContext
 	BranchCommits  *LocalCommitsContext
 	CommitFiles    *CommitFilesContext
+	Remotes        *RemotesContext
+	Submodules     types.IListContext
+	RemoteBranches types.IListContext
 	ReflogCommits  types.IListContext
 	SubCommits     types.IListContext
 	Stash          types.IListContext

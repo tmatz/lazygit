@@ -245,10 +245,6 @@ type MergingPanelState struct {
 	UserVerticalScrolling bool
 }
 
-type remotePanelState struct {
-	listPanelState
-}
-
 type remoteBranchesState struct {
 	listPanelState
 }
@@ -279,7 +275,6 @@ type suggestionsPanelState struct {
 // as we move things to the new context approach we're going to eventually
 // remove this struct altogether and store this state on the contexts.
 type panelStates struct {
-	Remotes        *remotePanelState
 	RemoteBranches *remoteBranchesState
 	ReflogCommits  *reflogCommitPanelState
 	SubCommits     *subCommitPanelState
@@ -424,7 +419,6 @@ func (gui *Gui) resetState(filterPath string, reuseState bool) {
 		Panels: &panelStates{
 			// TODO: work out why some of these are -1 and some are 0. Last time I checked there was a good reason but I'm less certain now
 			Submodules:     &submodulePanelState{listPanelState{SelectedLineIdx: -1}},
-			Remotes:        &remotePanelState{listPanelState{SelectedLineIdx: 0}},
 			RemoteBranches: &remoteBranchesState{listPanelState{SelectedLineIdx: -1}},
 			ReflogCommits:  &reflogCommitPanelState{listPanelState{SelectedLineIdx: 0}},
 			SubCommits:     &subCommitPanelState{listPanelState: listPanelState{SelectedLineIdx: 0}, refName: ""},
@@ -655,7 +649,6 @@ func (gui *Gui) resetControllers() {
 			gui.State.Contexts.Remotes,
 			gui.git,
 			gui.State.Contexts,
-			gui.getSelectedRemote,
 			func(branches []*models.RemoteBranch) { gui.State.Model.RemoteBranches = branches },
 		),
 		Menu: controllers.NewMenuController(

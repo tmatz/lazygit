@@ -12,10 +12,9 @@ type RemotesController struct {
 	baseController
 
 	c       *types.ControllerCommon
-	context types.IListContext
+	context *context.RemotesContext
 	git     *commands.GitCommand
 
-	getSelectedRemote func() *models.Remote
 	setRemoteBranches func([]*models.RemoteBranch)
 	contexts          *context.ContextTree
 }
@@ -24,10 +23,9 @@ var _ types.IController = &RemotesController{}
 
 func NewRemotesController(
 	c *types.ControllerCommon,
-	context types.IListContext,
+	context *context.RemotesContext,
 	git *commands.GitCommand,
 	contexts *context.ContextTree,
-	getSelectedRemote func() *models.Remote,
 	setRemoteBranches func([]*models.RemoteBranch),
 ) *RemotesController {
 	return &RemotesController{
@@ -36,7 +34,6 @@ func NewRemotesController(
 		git:               git,
 		contexts:          contexts,
 		context:           context,
-		getSelectedRemote: getSelectedRemote,
 		setRemoteBranches: setRemoteBranches,
 	}
 }
@@ -182,7 +179,7 @@ func (self *RemotesController) fetch(remote *models.Remote) error {
 
 func (self *RemotesController) checkSelected(callback func(*models.Remote) error) func() error {
 	return func() error {
-		file := self.getSelectedRemote()
+		file := self.context.GetSelectedRemote()
 		if file == nil {
 			return nil
 		}
