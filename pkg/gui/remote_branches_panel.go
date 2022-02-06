@@ -68,7 +68,7 @@ func (gui *Gui) handleRebaseOntoRemoteBranch() error {
 
 func (gui *Gui) handleSetBranchUpstream() error {
 	selectedBranch := gui.State.Contexts.RemoteBranches.GetSelected()
-	checkedOutBranch := gui.getCheckedOutBranch()
+	checkedOutBranch := gui.helpers.Refs.GetCheckedOutRef()
 
 	message := utils.ResolvePlaceholderString(
 		gui.c.Tr.SetUpstreamMessage,

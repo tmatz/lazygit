@@ -526,7 +526,7 @@ func (gui *Gui) refreshStatus() {
 	gui.Mutexes.RefreshingStatusMutex.Lock()
 	defer gui.Mutexes.RefreshingStatusMutex.Unlock()
 
-	currentBranch := gui.getCheckedOutBranch()
+	currentBranch := gui.helpers.Refs.GetCheckedOutRef()
 	if currentBranch == nil {
 		// need to wait for branches to refresh
 		return

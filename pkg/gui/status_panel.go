@@ -30,7 +30,7 @@ func (gui *Gui) handleCheckForUpdate() error {
 
 func (gui *Gui) handleStatusClick() error {
 	// TODO: move into some abstraction (status is currently not a listViewContext where a lot of this code lives)
-	currentBranch := gui.getCheckedOutBranch()
+	currentBranch := gui.helpers.Refs.GetCheckedOutRef()
 	if currentBranch == nil {
 		// need to wait for branches to refresh
 		return nil

@@ -1,7 +1,5 @@
 package gui
 
-import "github.com/jesseduffield/lazygit/pkg/commands/models"
-
 func (gui *Gui) branchesRenderToMain() error {
 	var task updateTask
 	branch := gui.State.Contexts.Branches.GetSelected()
@@ -19,12 +17,4 @@ func (gui *Gui) branchesRenderToMain() error {
 			task:  task,
 		},
 	})
-}
-
-func (gui *Gui) getCheckedOutBranch() *models.Branch {
-	if len(gui.State.Model.Branches) == 0 {
-		return nil
-	}
-
-	return gui.State.Model.Branches[0]
 }
