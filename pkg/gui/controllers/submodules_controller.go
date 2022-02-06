@@ -5,7 +5,6 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/jesseduffield/lazygit/pkg/commands"
 	"github.com/jesseduffield/lazygit/pkg/commands/models"
 	"github.com/jesseduffield/lazygit/pkg/gui/context"
 	"github.com/jesseduffield/lazygit/pkg/gui/style"
@@ -14,10 +13,8 @@ import (
 
 type SubmodulesController struct {
 	baseController
-
-	c       *types.ControllerCommon
+	*controllerCommon
 	context *context.SubmodulesContext
-	git     *commands.GitCommand
 
 	enterSubmodule func(submodule *models.SubmoduleConfig) error
 }
@@ -25,17 +22,14 @@ type SubmodulesController struct {
 var _ types.IController = &SubmodulesController{}
 
 func NewSubmodulesController(
-	c *types.ControllerCommon,
-	context *context.SubmodulesContext,
-	git *commands.GitCommand,
+	controllerCommon *controllerCommon,
 	enterSubmodule func(submodule *models.SubmoduleConfig) error,
 ) *SubmodulesController {
 	return &SubmodulesController{
-		baseController: baseController{},
-		c:              c,
-		context:        context,
-		git:            git,
-		enterSubmodule: enterSubmodule,
+		baseController:   baseController{},
+		controllerCommon: controllerCommon,
+		context:          controllerCommon.contexts.Submodules,
+		enterSubmodule:   enterSubmodule,
 	}
 }
 

@@ -13,13 +13,13 @@ type IFilesHelper interface {
 }
 
 type FilesHelper struct {
-	c   *types.ControllerCommon
+	c   *types.HelperCommon
 	git *commands.GitCommand
 	os  *oscommands.OSCommand
 }
 
 func NewFilesHelper(
-	c *types.ControllerCommon,
+	c *types.HelperCommon,
 	git *commands.GitCommand,
 	os *oscommands.OSCommand,
 ) *FilesHelper {

@@ -6,7 +6,7 @@ import (
 	"strings"
 
 	"github.com/jesseduffield/gocui"
-	"github.com/jesseduffield/lazygit/pkg/commands"
+	"github.com/jesseduffield/lazygit/pkg/commands/git_commands"
 	"github.com/jesseduffield/lazygit/pkg/commands/models"
 	"github.com/jesseduffield/lazygit/pkg/commands/oscommands"
 	"github.com/jesseduffield/lazygit/pkg/config"
@@ -17,73 +17,35 @@ import (
 )
 
 type FilesController struct {
-	// I've said publicly that I'm against single-letter variable names but in this
-	// case I would actually prefer a _zero_ letter variable name in the form of
-	// struct embedding, but Go does not allow hiding public fields in an embedded struct
-	// to the client
-	c       *types.ControllerCommon
+	baseController
+	*controllerCommon
 	context *context.WorkingTreeContext
-	model   *types.Model
-	git     *commands.GitCommand
-	os      *oscommands.OSCommand
 
-	getSelectedFileNode    func() *filetree.FileNode
-	contexts               *context.ContextTree
 	enterSubmodule         func(submodule *models.SubmoduleConfig) error
-	getSubmodules          func() []*models.SubmoduleConfig
 	setCommitMessage       func(message string)
-	getCheckedOutBranch    func() *models.Branch
 	withGpgHandling        func(cmdObj oscommands.ICmdObj, waitingStatus string, onSuccess func() error) error
 	getFailedCommitMessage func() string
-	getSelectedPath        func() string
 	switchToMergeFn        func(path string) error
-	suggestionsHelper      ISuggestionsHelper
-	refsHelper             IRefsHelper
-	filesHelper            IFilesHelper
-	workingTreeHelper      IWorkingTreeHelper
 }
 
 var _ types.IController = &FilesController{}
 
 func NewFilesController(
-	c *types.ControllerCommon,
-	context *context.WorkingTreeContext,
-	model *types.Model,
-	git *commands.GitCommand,
-	os *oscommands.OSCommand,
-	getSelectedFileNode func() *filetree.FileNode,
-	allContexts *context.ContextTree,
+	common *controllerCommon,
 	enterSubmodule func(submodule *models.SubmoduleConfig) error,
-	getSubmodules func() []*models.SubmoduleConfig,
 	setCommitMessage func(message string),
 	withGpgHandling func(cmdObj oscommands.ICmdObj, waitingStatus string, onSuccess func() error) error,
 	getFailedCommitMessage func() string,
-	getSelectedPath func() string,
 	switchToMergeFn func(path string) error,
-	suggestionsHelper ISuggestionsHelper,
-	refsHelper IRefsHelper,
-	filesHelper IFilesHelper,
-	workingTreeHelper IWorkingTreeHelper,
 ) *FilesController {
 	return &FilesController{
-		c:                      c,
-		context:                context,
-		model:                  model,
-		git:                    git,
-		os:                     os,
-		getSelectedFileNode:    getSelectedFileNode,
-		contexts:               allContexts,
+		controllerCommon:       common,
+		context:                common.contexts.Files,
 		enterSubmodule:         enterSubmodule,
-		getSubmodules:          getSubmodules,
 		setCommitMessage:       setCommitMessage,
 		withGpgHandling:        withGpgHandling,
 		getFailedCommitMessage: getFailedCommitMessage,
-		getSelectedPath:        getSelectedPath,
 		switchToMergeFn:        switchToMergeFn,
-		suggestionsHelper:      suggestionsHelper,
-		refsHelper:             refsHelper,
-		filesHelper:            filesHelper,
-		workingTreeHelper:      workingTreeHelper,
 	}
 }
 
@@ -187,6 +149,11 @@ func (self *FilesController) GetKeybindings(opts types.KeybindingsOpts) []*types
 			Handler:     self.OpenMergeTool,
 			Description: self.c.Tr.LcOpenMergeTool,
 		},
+		{
+			Key:         opts.GetKey(opts.Config.Files.Fetch),
+			Handler:     self.fetch,
+			Description: self.c.Tr.LcFetch,
+		},
 	}
 }
 
@@ -254,7 +221,7 @@ func (self *FilesController) press(node *filetree.FileNode) error {
 
 func (self *FilesController) checkSelectedFileNode(callback func(*filetree.FileNode) error) func() error {
 	return func() error {
-		node := self.getSelectedFileNode()
+		node := self.context.GetSelectedFileNode()
 		if node == nil {
 			return nil
 		}
@@ -268,7 +235,7 @@ func (self *FilesController) Context() types.Context {
 }
 
 func (self *FilesController) getSelectedFile() *models.File {
-	node := self.getSelectedFileNode()
+	node := self.context.GetSelectedFileNode()
 	if node == nil {
 		return nil
 	}
@@ -280,7 +247,7 @@ func (self *FilesController) enter() error {
 }
 
 func (self *FilesController) EnterFile(opts types.OnFocusOpts) error {
-	node := self.getSelectedFileNode()
+	node := self.context.GetSelectedFileNode()
 	if node == nil {
 		return nil
 	}
@@ -291,7 +258,7 @@ func (self *FilesController) EnterFile(opts types.OnFocusOpts) error {
 
 	file := node.File
 
-	submoduleConfigs := self.getSubmodules()
+	submoduleConfigs := self.model.Submodules
 	if file.IsSubmodule(submoduleConfigs) {
 		submoduleConfig := file.SubmoduleConfig(submoduleConfigs)
 		return self.enterSubmodule(submoduleConfig)
@@ -410,7 +377,7 @@ func (self *FilesController) commitPrefixConfigForRepo() *config.CommitPrefixCon
 }
 
 func (self *FilesController) prepareFilesForCommit() error {
-	noStagedFiles := !self.workingTreeHelper.AnyStagedFiles()
+	noStagedFiles := !self.helpers.WorkingTree.AnyStagedFiles()
 	if noStagedFiles && self.c.UserConfig.Gui.SkipNoStagedFilesWarning {
 		self.c.LogAction(self.c.Tr.Actions.StageAllFiles)
 		err := self.git.WorkingTree.StageAll()
@@ -442,7 +409,7 @@ func (self *FilesController) HandleCommitPress() error {
 		return self.c.ErrorMsg(self.c.Tr.NoFilesStagedTitle)
 	}
 
-	if !self.workingTreeHelper.AnyStagedFiles() {
+	if !self.helpers.WorkingTree.AnyStagedFiles() {
 		return self.promptToStageAllAndRetry(self.HandleCommitPress)
 	}
 
@@ -458,7 +425,7 @@ func (self *FilesController) HandleCommitPress() error {
 			if err != nil {
 				return self.c.ErrorMsg(fmt.Sprintf("%s: %s", self.c.Tr.LcCommitPrefixPatternError, err.Error()))
 			}
-			prefix := rgx.ReplaceAllString(self.getCheckedOutBranch().Name, prefixReplace)
+			prefix := rgx.ReplaceAllString(self.helpers.Refs.GetCheckedOutRef().Name, prefixReplace)
 			self.setCommitMessage(prefix)
 		}
 	}
@@ -493,7 +460,7 @@ func (self *FilesController) handleAmendCommitPress() error {
 		return self.c.ErrorMsg(self.c.Tr.NoFilesStagedTitle)
 	}
 
-	if !self.workingTreeHelper.AnyStagedFiles() {
+	if !self.helpers.WorkingTree.AnyStagedFiles() {
 		return self.promptToStageAllAndRetry(self.handleAmendCommitPress)
 	}
 
@@ -519,7 +486,7 @@ func (self *FilesController) HandleCommitEditorPress() error {
 		return self.c.ErrorMsg(self.c.Tr.NoFilesStagedTitle)
 	}
 
-	if !self.workingTreeHelper.AnyStagedFiles() {
+	if !self.helpers.WorkingTree.AnyStagedFiles() {
 		return self.promptToStageAllAndRetry(self.HandleCommitEditorPress)
 	}
 
@@ -565,16 +532,16 @@ func (self *FilesController) edit(node *filetree.FileNode) error {
 		return self.c.ErrorMsg(self.c.Tr.ErrCannotEditDirectory)
 	}
 
-	return self.filesHelper.EditFile(node.GetPath())
+	return self.helpers.Files.EditFile(node.GetPath())
 }
 
 func (self *FilesController) Open() error {
-	node := self.getSelectedFileNode()
+	node := self.context.GetSelectedFileNode()
 	if node == nil {
 		return nil
 	}
 
-	return self.filesHelper.OpenFile(node.GetPath())
+	return self.helpers.Files.OpenFile(node.GetPath())
 }
 
 func (self *FilesController) switchToMerge() error {
@@ -613,11 +580,11 @@ func (self *FilesController) stash() error {
 }
 
 func (self *FilesController) createResetMenu() error {
-	return self.refsHelper.CreateGitResetMenu("@{upstream}")
+	return self.helpers.Refs.CreateGitResetMenu("@{upstream}")
 }
 
 func (self *FilesController) handleToggleDirCollapsed() error {
-	node := self.getSelectedFileNode()
+	node := self.context.GetSelectedFileNode()
 	if node == nil {
 		return nil
 	}
@@ -654,7 +621,7 @@ func (self *FilesController) ResetSubmodule(submodule *models.SubmoduleConfig) e
 	return self.c.WithWaitingStatus(self.c.Tr.LcResettingSubmoduleStatus, func() error {
 		self.c.LogAction(self.c.Tr.Actions.ResetSubmodule)
 
-		file := self.workingTreeHelper.FileForSubmodule(submodule)
+		file := self.helpers.WorkingTree.FileForSubmodule(submodule)
 		if file != nil {
 			if err := self.git.WorkingTree.UnStageFile(file.Names(), file.Tracked); err != nil {
 				return self.c.Error(err)
@@ -673,7 +640,7 @@ func (self *FilesController) ResetSubmodule(submodule *models.SubmoduleConfig) e
 }
 
 func (self *FilesController) handleStashSave(stashFunc func(message string) error) error {
-	if !self.workingTreeHelper.IsWorkingTreeDirty() {
+	if !self.helpers.WorkingTree.IsWorkingTreeDirty() {
 		return self.c.ErrorMsg(self.c.Tr.NoTrackedStagedFilesStash)
 	}
 
@@ -696,4 +663,26 @@ func (self *FilesController) onClickMain(opts gocui.ViewMouseBindingOpts) error 
 func (self *FilesController) onClickSecondary(opts gocui.ViewMouseBindingOpts) error {
 	clickedViewLineIdx := opts.Cy + opts.Oy
 	return self.EnterFile(types.OnFocusOpts{ClickedViewName: "secondary", ClickedViewLineIdx: clickedViewLineIdx})
+}
+
+func (self *FilesController) fetch() error {
+	return self.c.WithLoaderPanel(self.c.Tr.FetchWait, func() error {
+		if err := self.fetchAux(); err != nil {
+			_ = self.c.Error(err)
+		}
+		return self.c.Refresh(types.RefreshOptions{Mode: types.ASYNC})
+	})
+}
+
+func (self *FilesController) fetchAux() (err error) {
+	self.c.LogAction("Fetch")
+	err = self.git.Sync.Fetch(git_commands.FetchOptions{})
+
+	if err != nil && strings.Contains(err.Error(), "exit status 128") {
+		_ = self.c.ErrorMsg(self.c.Tr.PassUnameWrong)
+	}
+
+	_ = self.c.Refresh(types.RefreshOptions{Scope: []types.RefreshableView{types.BRANCHES, types.COMMITS, types.REMOTES, types.TAGS}, Mode: types.ASYNC})
+
+	return err
 }

@@ -23,7 +23,7 @@ func NewLocalCommitsContext(
 	onRenderToMain func(...types.OnFocusOpts) error,
 	onFocusLost func() error,
 
-	c *types.ControllerCommon,
+	c *types.HelperCommon,
 ) *LocalCommitsContext {
 	viewModel := NewLocalCommitsViewModel(getModel)
 

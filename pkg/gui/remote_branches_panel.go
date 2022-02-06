@@ -34,7 +34,7 @@ func (gui *Gui) handleRemoteBranchesEscape() error {
 
 func (gui *Gui) handleMergeRemoteBranch() error {
 	selectedBranchName := gui.State.Contexts.RemoteBranches.GetSelected().FullName()
-	return gui.mergeBranchIntoCheckedOutBranch(selectedBranchName)
+	return gui.helpers.MergeAndRebase.MergeRefIntoCheckedOutBranch(selectedBranchName)
 }
 
 func (gui *Gui) handleDeleteRemoteBranch() error {
@@ -63,7 +63,7 @@ func (gui *Gui) handleDeleteRemoteBranch() error {
 
 func (gui *Gui) handleRebaseOntoRemoteBranch() error {
 	selectedBranchName := gui.State.Contexts.RemoteBranches.GetSelected().FullName()
-	return gui.handleRebaseOntoBranch(selectedBranchName)
+	return gui.helpers.MergeAndRebase.RebaseOntoRef(selectedBranchName)
 }
 
 func (gui *Gui) handleSetBranchUpstream() error {

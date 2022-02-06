@@ -85,7 +85,7 @@ func (gui *Gui) handleDiscardOldFileChange() error {
 			return gui.c.WithWaitingStatus(gui.c.Tr.RebasingStatus, func() error {
 				gui.c.LogAction(gui.c.Tr.Actions.DiscardOldFileChange)
 				if err := gui.git.Rebase.DiscardOldFileChanges(gui.State.Model.Commits, gui.State.Contexts.BranchCommits.GetSelectedLineIdx(), fileName); err != nil {
-					if err := gui.helpers.Rebase.CheckMergeOrRebase(err); err != nil {
+					if err := gui.helpers.MergeAndRebase.CheckMergeOrRebase(err); err != nil {
 						return err
 					}
 				}

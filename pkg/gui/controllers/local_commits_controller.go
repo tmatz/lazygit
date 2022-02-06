@@ -4,73 +4,38 @@ import (
 	"fmt"
 
 	"github.com/jesseduffield/gocui"
-	"github.com/jesseduffield/lazygit/pkg/commands"
-	"github.com/jesseduffield/lazygit/pkg/commands/hosting_service"
 	"github.com/jesseduffield/lazygit/pkg/commands/models"
-	"github.com/jesseduffield/lazygit/pkg/commands/oscommands"
 	"github.com/jesseduffield/lazygit/pkg/gui/context"
 	"github.com/jesseduffield/lazygit/pkg/gui/types"
 	"github.com/jesseduffield/lazygit/pkg/utils"
 )
 
 type (
-	CheckoutRefFn                func(refName string, opts types.CheckoutRefOptions) error
-	CreateGitResetMenuFn         func(refName string) error
 	SwitchToCommitFilesContextFn func(SwitchToCommitFilesContextOpts) error
-	GetHostingServiceMgrFn       func() *hosting_service.HostingServiceMgr
 	PullFilesFn                  func() error
-	CheckMergeOrRebase           func(error) error
 )
 
 type LocalCommitsController struct {
 	baseController
-	c                *types.ControllerCommon
-	context          *context.LocalCommitsContext
-	os               *oscommands.OSCommand
-	git              *commands.GitCommand
-	tagsHelper       *TagsHelper
-	refsHelper       IRefsHelper
-	cherryPickHelper *CherryPickHelper
-	rebaseHelper     *RebaseHelper
+	*controllerCommon
+	context *context.LocalCommitsContext
 
-	model                      *types.Model
-	CheckMergeOrRebase         CheckMergeOrRebase
 	pullFiles                  PullFilesFn
-	getHostingServiceMgr       GetHostingServiceMgrFn
 	switchToCommitFilesContext SwitchToCommitFilesContextFn
 }
 
 var _ types.IController = &LocalCommitsController{}
 
 func NewLocalCommitsController(
-	c *types.ControllerCommon,
-	context *context.LocalCommitsContext,
-	os *oscommands.OSCommand,
-	git *commands.GitCommand,
-	tagsHelper *TagsHelper,
-	refsHelper IRefsHelper,
-	cherryPickHelper *CherryPickHelper,
-	rebaseHelper *RebaseHelper,
-	model *types.Model,
-	CheckMergeOrRebase CheckMergeOrRebase,
+	common *controllerCommon,
 	pullFiles PullFilesFn,
-	getHostingServiceMgr GetHostingServiceMgrFn,
 	switchToCommitFilesContext SwitchToCommitFilesContextFn,
 ) *LocalCommitsController {
 	return &LocalCommitsController{
 		baseController:             baseController{},
-		c:                          c,
-		context:                    context,
-		os:                         os,
-		git:                        git,
-		tagsHelper:                 tagsHelper,
-		refsHelper:                 refsHelper,
-		cherryPickHelper:           cherryPickHelper,
-		rebaseHelper:               rebaseHelper,
-		model:                      model,
-		CheckMergeOrRebase:         CheckMergeOrRebase,
+		controllerCommon:           common,
+		context:                    common.contexts.BranchCommits,
 		pullFiles:                  pullFiles,
-		getHostingServiceMgr:       getHostingServiceMgr,
 		switchToCommitFilesContext: switchToCommitFilesContext,
 	}
 }
@@ -383,7 +348,7 @@ func (self *LocalCommitsController) pick() error {
 
 func (self *LocalCommitsController) interactiveRebase(action string) error {
 	err := self.git.Rebase.InteractiveRebase(self.model.Commits, self.context.GetSelectedLineIdx(), action)
-	return self.CheckMergeOrRebase(err)
+	return self.helpers.MergeAndRebase.CheckMergeOrRebase(err)
 }
 
 // handleMidRebaseCommand sees if the selected commit is in fact a rebasing
@@ -449,7 +414,7 @@ func (self *LocalCommitsController) handleCommitMoveDown() error {
 		if err == nil {
 			self.context.MoveSelectedLine(1)
 		}
-		return self.CheckMergeOrRebase(err)
+		return self.helpers.MergeAndRebase.CheckMergeOrRebase(err)
 	})
 }
 
@@ -484,7 +449,7 @@ func (self *LocalCommitsController) handleCommitMoveUp() error {
 		if err == nil {
 			self.context.MoveSelectedLine(-1)
 		}
-		return self.CheckMergeOrRebase(err)
+		return self.helpers.MergeAndRebase.CheckMergeOrRebase(err)
 	})
 }
 
@@ -496,7 +461,7 @@ func (self *LocalCommitsController) handleCommitAmendTo() error {
 			return self.c.WithWaitingStatus(self.c.Tr.AmendingStatus, func() error {
 				self.c.LogAction(self.c.Tr.Actions.AmendCommit)
 				err := self.git.Rebase.AmendTo(self.context.GetSelected().Sha)
-				return self.CheckMergeOrRebase(err)
+				return self.helpers.MergeAndRebase.CheckMergeOrRebase(err)
 			})
 		},
 	})
@@ -601,14 +566,14 @@ func (self *LocalCommitsController) handleSquashAllAboveFixupCommits(commit *mod
 			return self.c.WithWaitingStatus(self.c.Tr.SquashingStatus, func() error {
 				self.c.LogAction(self.c.Tr.Actions.SquashAllAboveFixupCommits)
 				err := self.git.Rebase.SquashAllAboveFixupCommits(commit.Sha)
-				return self.CheckMergeOrRebase(err)
+				return self.helpers.MergeAndRebase.CheckMergeOrRebase(err)
 			})
 		},
 	})
 }
 
 func (self *LocalCommitsController) handleTagCommit(commit *models.Commit) error {
-	return self.tagsHelper.CreateTagMenu(commit.Sha, func() {})
+	return self.helpers.Tags.CreateTagMenu(commit.Sha, func() {})
 }
 
 func (self *LocalCommitsController) handleCheckoutCommit(commit *models.Commit) error {
@@ -617,13 +582,13 @@ func (self *LocalCommitsController) handleCheckoutCommit(commit *models.Commit) 
 		Prompt: self.c.Tr.SureCheckoutThisCommit,
 		HandleConfirm: func() error {
 			self.c.LogAction(self.c.Tr.Actions.CheckoutCommit)
-			return self.refsHelper.CheckoutRef(commit.Sha, types.CheckoutRefOptions{})
+			return self.helpers.Refs.CheckoutRef(commit.Sha, types.CheckoutRefOptions{})
 		},
 	})
 }
 
 func (self *LocalCommitsController) handleCreateCommitResetMenu(commit *models.Commit) error {
-	return self.refsHelper.CreateGitResetMenu(commit.Sha)
+	return self.helpers.Refs.CreateGitResetMenu(commit.Sha)
 }
 
 func (self *LocalCommitsController) openSearch() error {
@@ -754,9 +719,7 @@ func (self *LocalCommitsController) handleOpenLogMenu() error {
 }
 
 func (self *LocalCommitsController) handleOpenCommitInBrowser(commit *models.Commit) error {
-	hostingServiceMgr := self.getHostingServiceMgr()
-
-	url, err := hostingServiceMgr.GetCommitURL(commit.Sha)
+	url, err := self.helpers.Host.GetCommitURL(commit.Sha)
 	if err != nil {
 		return self.c.Error(err)
 	}
@@ -785,17 +748,17 @@ func (self *LocalCommitsController) Context() types.Context {
 }
 
 func (self *LocalCommitsController) newBranch(commit *models.Commit) error {
-	return self.refsHelper.NewBranch(commit.RefName(), commit.Description(), "")
+	return self.helpers.Refs.NewBranch(commit.RefName(), commit.Description(), "")
 }
 
 func (self *LocalCommitsController) copy(commit *models.Commit) error {
-	return self.cherryPickHelper.Copy(commit, self.model.Commits, self.context)
+	return self.helpers.CherryPick.Copy(commit, self.model.Commits, self.context)
 }
 
 func (self *LocalCommitsController) copyRange(*models.Commit) error {
-	return self.cherryPickHelper.CopyRange(self.context.GetSelectedLineIdx(), self.model.Commits, self.context)
+	return self.helpers.CherryPick.CopyRange(self.context.GetSelectedLineIdx(), self.model.Commits, self.context)
 }
 
 func (self *LocalCommitsController) paste() error {
-	return self.cherryPickHelper.Paste()
+	return self.helpers.CherryPick.Paste()
 }
