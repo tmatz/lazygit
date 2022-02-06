@@ -1,4 +1,4 @@
-package controllers
+package helpers
 
 type Helpers struct {
 	Refs           *RefsHelper

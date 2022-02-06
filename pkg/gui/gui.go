@@ -20,6 +20,7 @@ import (
 	"github.com/jesseduffield/lazygit/pkg/config"
 	"github.com/jesseduffield/lazygit/pkg/gui/context"
 	"github.com/jesseduffield/lazygit/pkg/gui/controllers"
+	"github.com/jesseduffield/lazygit/pkg/gui/controllers/helpers"
 	"github.com/jesseduffield/lazygit/pkg/gui/lbl"
 	"github.com/jesseduffield/lazygit/pkg/gui/mergeconflicts"
 	"github.com/jesseduffield/lazygit/pkg/gui/modes/cherrypicking"
@@ -140,7 +141,7 @@ type Gui struct {
 	PrevLayout PrevLayout
 
 	c       *types.HelperCommon
-	helpers *controllers.Helpers
+	helpers *helpers.Helpers
 }
 
 // we keep track of some stuff from one render to the next to see if certain
@@ -480,22 +481,22 @@ func (gui *Gui) resetControllers() {
 	controllerCommon := gui.c
 	osCommand := gui.os
 	model := gui.State.Model
-	refsHelper := controllers.NewRefsHelper(
+	refsHelper := helpers.NewRefsHelper(
 		controllerCommon,
 		gui.git,
 		gui.State.Contexts,
 		model,
 	)
-	rebaseHelper := controllers.NewMergeAndRebaseHelper(controllerCommon, gui.State.Contexts, gui.git, gui.takeOverMergeConflictScrolling, refsHelper)
-	gui.helpers = &controllers.Helpers{
+	rebaseHelper := helpers.NewMergeAndRebaseHelper(controllerCommon, gui.State.Contexts, gui.git, gui.takeOverMergeConflictScrolling, refsHelper)
+	gui.helpers = &helpers.Helpers{
 		Refs:           refsHelper,
-		Bisect:         controllers.NewBisectHelper(controllerCommon, gui.git),
-		Suggestions:    controllers.NewSuggestionsHelper(controllerCommon, model, gui.refreshSuggestions),
-		Files:          controllers.NewFilesHelper(controllerCommon, gui.git, osCommand),
-		WorkingTree:    controllers.NewWorkingTreeHelper(model),
-		Tags:           controllers.NewTagsHelper(controllerCommon, gui.git),
+		Bisect:         helpers.NewBisectHelper(controllerCommon, gui.git),
+		Suggestions:    helpers.NewSuggestionsHelper(controllerCommon, model, gui.refreshSuggestions),
+		Files:          helpers.NewFilesHelper(controllerCommon, gui.git, osCommand),
+		WorkingTree:    helpers.NewWorkingTreeHelper(model),
+		Tags:           helpers.NewTagsHelper(controllerCommon, gui.git),
 		MergeAndRebase: rebaseHelper,
-		CherryPick: controllers.NewCherryPickHelper(
+		CherryPick: helpers.NewCherryPickHelper(
 			controllerCommon,
 			gui.git,
 			gui.State.Contexts,

@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"github.com/jesseduffield/lazygit/pkg/gui/controllers/helpers"
 	"github.com/jesseduffield/lazygit/pkg/gui/types"
 	"github.com/jesseduffield/lazygit/pkg/utils"
 )
@@ -58,7 +59,7 @@ func (self *GlobalController) GetCustomCommandsHistorySuggestionsFunc() func(str
 	// reversing so that we display the latest command first
 	history := utils.Reverse(self.c.GetAppState().CustomCommandsHistory)
 
-	return FuzzySearchFunc(history)
+	return helpers.FuzzySearchFunc(history)
 }
 
 func (self *GlobalController) Context() types.Context {
