@@ -205,37 +205,24 @@ func (gui *Gui) shouldShowGraph() bool {
 	return false
 }
 
-func (gui *Gui) reflogCommitsListContext() types.IListContext {
-	parseEmoji := gui.c.UserConfig.Git.ParseEmoji
-	return (&ListContext{
-		BaseContext: context.NewBaseContext(context.NewBaseContextOpts{
-			ViewName:   "commits",
-			WindowName: "commits",
-			Key:        context.REFLOG_COMMITS_CONTEXT_KEY,
-			Kind:       types.SIDE_CONTEXT,
-			Focusable:  true,
-		}),
-		GetItemsLength:  func() int { return len(gui.State.Model.FilteredReflogCommits) },
-		OnGetPanelState: func() types.IListPanelState { return gui.State.Panels.ReflogCommits },
-		OnRenderToMain:  OnFocusWrapper(gui.withDiffModeCheck(gui.reflogCommitsRenderToMain)),
-		Gui:             gui,
-		GetDisplayStrings: func(startIdx int, length int) [][]string {
+func (gui *Gui) reflogCommitsListContext() *context.ReflogCommitsContext {
+	return context.NewReflogCommitsContext(
+		func() []*models.Commit { return gui.State.Model.FilteredReflogCommits },
+		gui.Views.Commits,
+		func(startIdx int, length int) [][]string {
 			return presentation.GetReflogCommitListDisplayStrings(
 				gui.State.Model.FilteredReflogCommits,
 				gui.State.ScreenMode != SCREEN_NORMAL,
 				gui.helpers.CherryPick.CherryPickedCommitShaMap(),
 				gui.State.Modes.Diffing.Ref,
-				parseEmoji,
+				gui.c.UserConfig.Git.ParseEmoji,
 			)
 		},
-		OnGetSelectedItemId: func() string {
-			item := gui.getSelectedReflogCommit()
-			if item == nil {
-				return ""
-			}
-			return item.ID()
-		},
-	}).attachKeybindings()
+		nil,
+		OnFocusWrapper(gui.withDiffModeCheck(gui.reflogCommitsRenderToMain)),
+		nil,
+		gui.c,
+	)
 }
 
 func (gui *Gui) stashListContext() types.IListContext {

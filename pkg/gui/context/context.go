@@ -72,7 +72,7 @@ type ContextTree struct {
 	Remotes        *RemotesContext
 	Submodules     *SubmodulesContext
 	RemoteBranches *RemoteBranchesContext
-	ReflogCommits  types.IListContext
+	ReflogCommits  *ReflogCommitsContext
 	SubCommits     types.IListContext
 	Stash          types.IListContext
 	Suggestions    types.IListContext

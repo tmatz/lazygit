@@ -45,7 +45,7 @@ func (gui *Gui) resolveTemplate(templateStr string, promptResponses []string) (s
 		SelectedFile:           gui.getSelectedFile(),
 		SelectedPath:           gui.getSelectedPath(),
 		SelectedLocalCommit:    gui.State.Contexts.BranchCommits.GetSelectedCommit(),
-		SelectedReflogCommit:   gui.getSelectedReflogCommit(),
+		SelectedReflogCommit:   gui.State.Contexts.ReflogCommits.GetSelectedReflogCommit(),
 		SelectedLocalBranch:    gui.State.Contexts.Branches.GetSelectedBranch(),
 		SelectedRemoteBranch:   gui.State.Contexts.RemoteBranches.GetSelectedRemoteBranch(),
 		SelectedRemote:         gui.State.Contexts.Remotes.GetSelectedRemote(),

@@ -245,10 +245,6 @@ type MergingPanelState struct {
 	UserVerticalScrolling bool
 }
 
-type reflogCommitPanelState struct {
-	listPanelState
-}
-
 type subCommitPanelState struct {
 	listPanelState
 
@@ -267,12 +263,11 @@ type suggestionsPanelState struct {
 // as we move things to the new context approach we're going to eventually
 // remove this struct altogether and store this state on the contexts.
 type panelStates struct {
-	ReflogCommits *reflogCommitPanelState
-	SubCommits    *subCommitPanelState
-	Stash         *stashPanelState
-	LineByLine    *LblPanelState
-	Merging       *MergingPanelState
-	Suggestions   *suggestionsPanelState
+	SubCommits  *subCommitPanelState
+	Stash       *stashPanelState
+	LineByLine  *LblPanelState
+	Merging     *MergingPanelState
+	Suggestions *suggestionsPanelState
 }
 
 type Views struct {
@@ -408,10 +403,9 @@ func (gui *Gui) resetState(filterPath string, reuseState bool) {
 
 		Panels: &panelStates{
 			// TODO: work out why some of these are -1 and some are 0. Last time I checked there was a good reason but I'm less certain now
-			ReflogCommits: &reflogCommitPanelState{listPanelState{SelectedLineIdx: 0}},
-			SubCommits:    &subCommitPanelState{listPanelState: listPanelState{SelectedLineIdx: 0}, refName: ""},
-			Stash:         &stashPanelState{listPanelState{SelectedLineIdx: -1}},
-			Suggestions:   &suggestionsPanelState{listPanelState: listPanelState{SelectedLineIdx: 0}},
+			SubCommits:  &subCommitPanelState{listPanelState: listPanelState{SelectedLineIdx: 0}, refName: ""},
+			Stash:       &stashPanelState{listPanelState{SelectedLineIdx: -1}},
+			Suggestions: &suggestionsPanelState{listPanelState: listPanelState{SelectedLineIdx: 0}},
 			Merging: &MergingPanelState{
 				State:                 mergeconflicts.NewState(),
 				UserVerticalScrolling: false,
