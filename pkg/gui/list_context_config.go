@@ -42,30 +42,18 @@ func (gui *Gui) filesListContext() *context.WorkingTreeContext {
 	)
 }
 
-func (gui *Gui) branchesListContext() types.IListContext {
-	return (&ListContext{
-		BaseContext: context.NewBaseContext(context.NewBaseContextOpts{
-			ViewName:   "branches",
-			WindowName: "branches",
-			Key:        context.LOCAL_BRANCHES_CONTEXT_KEY,
-			Kind:       types.SIDE_CONTEXT,
-			Focusable:  true,
-		}),
-		GetItemsLength:  func() int { return len(gui.State.Model.Branches) },
-		OnGetPanelState: func() types.IListPanelState { return gui.State.Panels.Branches },
-		OnRenderToMain:  OnFocusWrapper(gui.withDiffModeCheck(gui.branchesRenderToMain)),
-		Gui:             gui,
-		GetDisplayStrings: func(startIdx int, length int) [][]string {
+func (gui *Gui) branchesListContext() *context.BranchesContext {
+	return context.NewBranchesContext(
+		func() []*models.Branch { return gui.State.Model.Branches },
+		gui.Views.Branches,
+		func(startIdx int, length int) [][]string {
 			return presentation.GetBranchListDisplayStrings(gui.State.Model.Branches, gui.State.ScreenMode != SCREEN_NORMAL, gui.State.Modes.Diffing.Ref)
 		},
-		OnGetSelectedItemId: func() string {
-			item := gui.getSelectedBranch()
-			if item == nil {
-				return ""
-			}
-			return item.ID()
-		},
-	}).attachKeybindings()
+		nil,
+		OnFocusWrapper(gui.withDiffModeCheck(gui.branchesRenderToMain)),
+		nil,
+		gui.c,
+	)
 }
 
 func (gui *Gui) remotesListContext() types.IListContext {

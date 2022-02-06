@@ -62,7 +62,7 @@ type ContextTree struct {
 	Files          *WorkingTreeContext
 	Submodules     types.IListContext
 	Menu           *MenuContext
-	Branches       types.IListContext
+	Branches       *BranchesContext
 	Remotes        types.IListContext
 	RemoteBranches types.IListContext
 	Tags           *TagsContext

@@ -8,7 +8,7 @@ import (
 )
 
 func (gui *Gui) handleCreateGitFlowMenu() error {
-	branch := gui.getSelectedBranch()
+	branch := gui.State.Contexts.Branches.GetSelectedBranch()
 	if branch == nil {
 		return nil
 	}

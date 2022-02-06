@@ -245,11 +245,6 @@ type MergingPanelState struct {
 	UserVerticalScrolling bool
 }
 
-// TODO: consider splitting this out into the window and the branches view
-type branchPanelState struct {
-	listPanelState
-}
-
 type remotePanelState struct {
 	listPanelState
 }
@@ -284,7 +279,6 @@ type suggestionsPanelState struct {
 // as we move things to the new context approach we're going to eventually
 // remove this struct altogether and store this state on the contexts.
 type panelStates struct {
-	Branches       *branchPanelState
 	Remotes        *remotePanelState
 	RemoteBranches *remoteBranchesState
 	ReflogCommits  *reflogCommitPanelState
@@ -430,7 +424,6 @@ func (gui *Gui) resetState(filterPath string, reuseState bool) {
 		Panels: &panelStates{
 			// TODO: work out why some of these are -1 and some are 0. Last time I checked there was a good reason but I'm less certain now
 			Submodules:     &submodulePanelState{listPanelState{SelectedLineIdx: -1}},
-			Branches:       &branchPanelState{listPanelState{SelectedLineIdx: 0}},
 			Remotes:        &remotePanelState{listPanelState{SelectedLineIdx: 0}},
 			RemoteBranches: &remoteBranchesState{listPanelState{SelectedLineIdx: -1}},
 			ReflogCommits:  &reflogCommitPanelState{listPanelState{SelectedLineIdx: 0}},
