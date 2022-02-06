@@ -300,30 +300,18 @@ func (gui *Gui) commitFilesListContext() *context.CommitFilesContext {
 	)
 }
 
-func (gui *Gui) submodulesListContext() types.IListContext {
-	return (&ListContext{
-		BaseContext: context.NewBaseContext(context.NewBaseContextOpts{
-			ViewName:   "files",
-			WindowName: "files",
-			Key:        context.SUBMODULES_CONTEXT_KEY,
-			Kind:       types.SIDE_CONTEXT,
-			Focusable:  true,
-		}),
-		GetItemsLength:  func() int { return len(gui.State.Model.Submodules) },
-		OnGetPanelState: func() types.IListPanelState { return gui.State.Panels.Submodules },
-		OnRenderToMain:  OnFocusWrapper(gui.withDiffModeCheck(gui.submodulesRenderToMain)),
-		Gui:             gui,
-		GetDisplayStrings: func(startIdx int, length int) [][]string {
+func (gui *Gui) submodulesListContext() *context.SubmodulesContext {
+	return context.NewSubmodulesContext(
+		func() []*models.SubmoduleConfig { return gui.State.Model.Submodules },
+		gui.Views.Files,
+		func(startIdx int, length int) [][]string {
 			return presentation.GetSubmoduleListDisplayStrings(gui.State.Model.Submodules)
 		},
-		OnGetSelectedItemId: func() string {
-			item := gui.getSelectedSubmodule()
-			if item == nil {
-				return ""
-			}
-			return item.ID()
-		},
-	}).attachKeybindings()
+		nil,
+		OnFocusWrapper(gui.withDiffModeCheck(gui.submodulesRenderToMain)),
+		nil,
+		gui.c,
+	)
 }
 
 func (gui *Gui) suggestionsListContext() types.IListContext {

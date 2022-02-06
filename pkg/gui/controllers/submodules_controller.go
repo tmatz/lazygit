@@ -7,6 +7,7 @@ import (
 
 	"github.com/jesseduffield/lazygit/pkg/commands"
 	"github.com/jesseduffield/lazygit/pkg/commands/models"
+	"github.com/jesseduffield/lazygit/pkg/gui/context"
 	"github.com/jesseduffield/lazygit/pkg/gui/style"
 	"github.com/jesseduffield/lazygit/pkg/gui/types"
 )
@@ -15,29 +16,26 @@ type SubmodulesController struct {
 	baseController
 
 	c       *types.ControllerCommon
-	context types.IListContext
+	context *context.SubmodulesContext
 	git     *commands.GitCommand
 
-	enterSubmodule       func(submodule *models.SubmoduleConfig) error
-	getSelectedSubmodule func() *models.SubmoduleConfig
+	enterSubmodule func(submodule *models.SubmoduleConfig) error
 }
 
 var _ types.IController = &SubmodulesController{}
 
 func NewSubmodulesController(
 	c *types.ControllerCommon,
-	context types.IListContext,
+	context *context.SubmodulesContext,
 	git *commands.GitCommand,
 	enterSubmodule func(submodule *models.SubmoduleConfig) error,
-	getSelectedSubmodule func() *models.SubmoduleConfig,
 ) *SubmodulesController {
 	return &SubmodulesController{
-		baseController:       baseController{},
-		c:                    c,
-		context:              context,
-		git:                  git,
-		enterSubmodule:       enterSubmodule,
-		getSelectedSubmodule: getSelectedSubmodule,
+		baseController: baseController{},
+		c:              c,
+		context:        context,
+		git:            git,
+		enterSubmodule: enterSubmodule,
 	}
 }
 
@@ -229,7 +227,7 @@ func (self *SubmodulesController) remove(submodule *models.SubmoduleConfig) erro
 
 func (self *SubmodulesController) checkSelected(callback func(*models.SubmoduleConfig) error) func() error {
 	return func() error {
-		submodule := self.getSelectedSubmodule()
+		submodule := self.context.GetSelectedSubmodule()
 		if submodule == nil {
 			return nil
 		}

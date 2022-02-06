@@ -264,10 +264,6 @@ type stashPanelState struct {
 	listPanelState
 }
 
-type submodulePanelState struct {
-	listPanelState
-}
-
 type suggestionsPanelState struct {
 	listPanelState
 }
@@ -281,7 +277,6 @@ type panelStates struct {
 	Stash          *stashPanelState
 	LineByLine     *LblPanelState
 	Merging        *MergingPanelState
-	Submodules     *submodulePanelState
 	Suggestions    *suggestionsPanelState
 }
 
@@ -418,7 +413,6 @@ func (gui *Gui) resetState(filterPath string, reuseState bool) {
 
 		Panels: &panelStates{
 			// TODO: work out why some of these are -1 and some are 0. Last time I checked there was a good reason but I'm less certain now
-			Submodules:     &submodulePanelState{listPanelState{SelectedLineIdx: -1}},
 			RemoteBranches: &remoteBranchesState{listPanelState{SelectedLineIdx: -1}},
 			ReflogCommits:  &reflogCommitPanelState{listPanelState{SelectedLineIdx: 0}},
 			SubCommits:     &subCommitPanelState{listPanelState: listPanelState{SelectedLineIdx: 0}, refName: ""},
@@ -578,7 +572,6 @@ func (gui *Gui) resetControllers() {
 		gui.State.Contexts.Submodules,
 		gui.git,
 		gui.enterSubmodule,
-		gui.getSelectedSubmodule,
 	)
 
 	bisectController := controllers.NewBisectController(

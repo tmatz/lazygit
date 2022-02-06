@@ -70,7 +70,7 @@ type ContextTree struct {
 	BranchCommits  *LocalCommitsContext
 	CommitFiles    *CommitFilesContext
 	Remotes        *RemotesContext
-	Submodules     types.IListContext
+	Submodules     *SubmodulesContext
 	RemoteBranches types.IListContext
 	ReflogCommits  types.IListContext
 	SubCommits     types.IListContext
