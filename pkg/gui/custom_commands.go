@@ -50,7 +50,7 @@ func (gui *Gui) resolveTemplate(templateStr string, promptResponses []string) (s
 		SelectedRemoteBranch:   gui.State.Contexts.RemoteBranches.GetSelectedRemoteBranch(),
 		SelectedRemote:         gui.State.Contexts.Remotes.GetSelectedRemote(),
 		SelectedTag:            gui.State.Contexts.Tags.GetSelectedTag(),
-		SelectedStashEntry:     gui.getSelectedStashEntry(),
+		SelectedStashEntry:     gui.State.Contexts.Stash.GetSelectedStashEntry(),
 		SelectedCommitFile:     gui.getSelectedCommitFile(),
 		SelectedCommitFilePath: gui.getSelectedCommitFilePath(),
 		SelectedSubCommit:      gui.State.Contexts.SubCommits.GetSelectedCommit(),

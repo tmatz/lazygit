@@ -211,30 +211,18 @@ func (gui *Gui) reflogCommitsListContext() *context.ReflogCommitsContext {
 	)
 }
 
-func (gui *Gui) stashListContext() types.IListContext {
-	return (&ListContext{
-		BaseContext: context.NewBaseContext(context.NewBaseContextOpts{
-			ViewName:   "stash",
-			WindowName: "stash",
-			Key:        context.STASH_CONTEXT_KEY,
-			Kind:       types.SIDE_CONTEXT,
-			Focusable:  true,
-		}),
-		GetItemsLength:  func() int { return len(gui.State.Model.StashEntries) },
-		OnGetPanelState: func() types.IListPanelState { return gui.State.Panels.Stash },
-		OnRenderToMain:  OnFocusWrapper(gui.withDiffModeCheck(gui.stashRenderToMain)),
-		Gui:             gui,
-		GetDisplayStrings: func(startIdx int, length int) [][]string {
+func (gui *Gui) stashListContext() *context.StashContext {
+	return context.NewStashContext(
+		func() []*models.StashEntry { return gui.State.Model.StashEntries },
+		gui.Views.Stash,
+		func(startIdx int, length int) [][]string {
 			return presentation.GetStashEntryListDisplayStrings(gui.State.Model.StashEntries, gui.State.Modes.Diffing.Ref)
 		},
-		OnGetSelectedItemId: func() string {
-			item := gui.getSelectedStashEntry()
-			if item == nil {
-				return ""
-			}
-			return item.ID()
-		},
-	}).attachKeybindings()
+		nil,
+		OnFocusWrapper(gui.withDiffModeCheck(gui.stashRenderToMain)),
+		nil,
+		gui.c,
+	)
 }
 
 func (gui *Gui) commitFilesListContext() *context.CommitFilesContext {
