@@ -70,30 +70,18 @@ func (gui *Gui) remotesListContext() *context.RemotesContext {
 	)
 }
 
-func (gui *Gui) remoteBranchesListContext() types.IListContext {
-	return (&ListContext{
-		BaseContext: context.NewBaseContext(context.NewBaseContextOpts{
-			ViewName:   "branches",
-			WindowName: "branches",
-			Key:        context.REMOTE_BRANCHES_CONTEXT_KEY,
-			Kind:       types.SIDE_CONTEXT,
-			Focusable:  true,
-		}),
-		GetItemsLength:  func() int { return len(gui.State.Model.RemoteBranches) },
-		OnGetPanelState: func() types.IListPanelState { return gui.State.Panels.RemoteBranches },
-		OnRenderToMain:  OnFocusWrapper(gui.withDiffModeCheck(gui.remoteBranchesRenderToMain)),
-		Gui:             gui,
-		GetDisplayStrings: func(startIdx int, length int) [][]string {
+func (gui *Gui) remoteBranchesListContext() *context.RemoteBranchesContext {
+	return context.NewRemoteBranchesContext(
+		func() []*models.RemoteBranch { return gui.State.Model.RemoteBranches },
+		gui.Views.Branches,
+		func(startIdx int, length int) [][]string {
 			return presentation.GetRemoteBranchListDisplayStrings(gui.State.Model.RemoteBranches, gui.State.Modes.Diffing.Ref)
 		},
-		OnGetSelectedItemId: func() string {
-			item := gui.getSelectedRemoteBranch()
-			if item == nil {
-				return ""
-			}
-			return item.ID()
-		},
-	}).attachKeybindings()
+		nil,
+		OnFocusWrapper(gui.withDiffModeCheck(gui.remoteBranchesRenderToMain)),
+		nil,
+		gui.c,
+	)
 }
 
 func (gui *Gui) withDiffModeCheck(f func() error) func() error {
