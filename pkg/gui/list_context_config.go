@@ -266,7 +266,7 @@ func (gui *Gui) submodulesListContext() *context.SubmodulesContext {
 func (gui *Gui) suggestionsListContext() *context.SuggestionsContext {
 	return context.NewSuggestionsContext(
 		func() []*types.Suggestion { return gui.State.Suggestions },
-		gui.Views.Files,
+		gui.Views.Suggestions,
 		func(startIdx int, length int) [][]string {
 			return presentation.GetSuggestionListDisplayStrings(gui.State.Suggestions)
 		},
