@@ -487,6 +487,7 @@ func (gui *Gui) resetControllers() {
 	rebaseHelper := helpers.NewMergeAndRebaseHelper(controllerCommon, gui.State.Contexts, gui.git, gui.takeOverMergeConflictScrolling, refsHelper)
 	gui.helpers = &helpers.Helpers{
 		Refs:           refsHelper,
+		PatchBuilding:  helpers.NewPatchBuildingHelper(controllerCommon, gui.git),
 		Bisect:         helpers.NewBisectHelper(controllerCommon, gui.git),
 		Suggestions:    helpers.NewSuggestionsHelper(controllerCommon, model, gui.refreshSuggestions),
 		Files:          helpers.NewFilesHelper(controllerCommon, gui.git, osCommand),
@@ -524,8 +525,8 @@ func (gui *Gui) resetControllers() {
 
 	bisectController := controllers.NewBisectController(common)
 
-	reflogController := controllers.NewReflogController(common, gui.SwitchToCommitFilesContext)
-	subCommitsController := controllers.NewSubCommitsController(common, gui.SwitchToCommitFilesContext)
+	reflogController := controllers.NewReflogController(common)
+	subCommitsController := controllers.NewSubCommitsController(common)
 
 	gui.Controllers = Controllers{
 		Submodules: submodulesController,
@@ -538,12 +539,8 @@ func (gui *Gui) resetControllers() {
 			func() string { return gui.State.failedCommitMessage },
 			gui.switchToMerge,
 		),
-		Tags: controllers.NewTagsController(common),
-		LocalCommits: controllers.NewLocalCommitsController(
-			common,
-			syncController.HandlePull,
-			gui.SwitchToCommitFilesContext,
-		),
+		Tags:         controllers.NewTagsController(common),
+		LocalCommits: controllers.NewLocalCommitsController(common, syncController.HandlePull),
 		Remotes: controllers.NewRemotesController(
 			common,
 			func(branches []*models.RemoteBranch) { gui.State.Model.RemoteBranches = branches },
@@ -557,6 +554,7 @@ func (gui *Gui) resetControllers() {
 	gitFlowController := controllers.NewGitFlowController(common)
 	filesRemoveController := controllers.NewFilesRemoveController(common)
 	stashController := controllers.NewStashController(common)
+	commitFilesController := controllers.NewCommitFilesController(common)
 
 	switchToSubCommitsControllerFactory := controllers.NewSubCommitsSwitchControllerFactory(
 		common,
@@ -592,6 +590,7 @@ func (gui *Gui) resetControllers() {
 	controllers.AttachControllers(gui.State.Contexts.LocalCommits, gui.Controllers.LocalCommits, bisectController)
 	controllers.AttachControllers(gui.State.Contexts.ReflogCommits, reflogController)
 	controllers.AttachControllers(gui.State.Contexts.SubCommits, subCommitsController)
+	controllers.AttachControllers(gui.State.Contexts.CommitFiles, commitFilesController)
 	controllers.AttachControllers(gui.State.Contexts.Remotes, gui.Controllers.Remotes)
 	controllers.AttachControllers(gui.State.Contexts.Stash, stashController)
 	controllers.AttachControllers(gui.State.Contexts.Menu, gui.Controllers.Menu)
