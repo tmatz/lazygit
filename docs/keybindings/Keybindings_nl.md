@@ -63,14 +63,14 @@ _This file is auto-generated. To update, make the changes in the pkg/i18n direct
 ## Branches Paneel (Remote Branches (in Remotes tabblad))
 
 <pre>
-  <kbd>esc</kbd>: Ga terug naar remotes lijst
-  <kbd>g</kbd>: bekijk reset opties
   <kbd>space</kbd>: uitchecken
   <kbd>n</kbd>: nieuwe branch
   <kbd>M</kbd>: merge in met huidige checked out branch
-  <kbd>d</kbd>: verwijder branch
   <kbd>r</kbd>: rebase branch
+  <kbd>d</kbd>: verwijder branch
   <kbd>u</kbd>: stel in als upstream van uitgecheckte branch
+  <kbd>esc</kbd>: Ga terug naar remotes lijst
+  <kbd>g</kbd>: bekijk reset opties
   <kbd>enter</kbd>: bekijk commits
 </pre>
 
@@ -178,7 +178,6 @@ _This file is auto-generated. To update, make the changes in the pkg/i18n direct
 ## Bestanden Paneel (Bestanden)
 
 <pre>
-  <kbd>D</kbd>: bekijk reset opties
   <kbd>ctrl+o</kbd>: kopieer de bestandsnaam naar het klembord
   <kbd>ctrl+w</kbd>: Toggle whether or not whitespace changes are shown in the diff view
   <kbd>d</kbd>: bekijk 'veranderingen ongedaan maken' opties
@@ -197,6 +196,7 @@ _This file is auto-generated. To update, make the changes in the pkg/i18n direct
   <kbd>a</kbd>: toggle staged alle
   <kbd>enter</kbd>: stage individuele hunks/lijnen
   <kbd>g</kbd>: bekijk upstream reset opties
+  <kbd>D</kbd>: bekijk reset opties
   <kbd>`</kbd>: toggle bestandsboom weergave
   <kbd>M</kbd>: open external merge tool (git mergetool)
   <kbd>f</kbd>: fetch
