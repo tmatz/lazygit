@@ -42,8 +42,8 @@ _This file is auto-generated. To update, make the changes in the pkg/i18n direct
 ## Branches Paneel (Branches Tabblad)
 
 <pre>
-  <kbd>i</kbd>: laat git-flow opties zien
   <kbd>ctrl+o</kbd>: kopieer branch name naar klembord
+  <kbd>i</kbd>: laat git-flow opties zien
   <kbd>space</kbd>: uitchecken
   <kbd>o</kbd>: maak een pull-request
   <kbd>O</kbd>: bekijk opties voor pull-aanvraag
@@ -86,14 +86,14 @@ _This file is auto-generated. To update, make the changes in the pkg/i18n direct
 ## Branches Paneel (Sub-commits)
 
 <pre>
-  <kbd>enter</kbd>: bekijk gecommite bestanden
+  <kbd>ctrl+o</kbd>: kopieer commit SHA naar klembord
   <kbd>space</kbd>: checkout commit
   <kbd>g</kbd>: bekijk reset opties
   <kbd>n</kbd>: nieuwe branch
   <kbd>c</kbd>: kopieer commit (cherry-pick)
   <kbd>C</kbd>: kopieer commit reeks (cherry-pick)
   <kbd>ctrl+r</kbd>: reset cherry-picked (gekopieerde) commits selectie
-  <kbd>ctrl+o</kbd>: kopieer commit SHA naar klembord
+  <kbd>enter</kbd>: bekijk gecommite bestanden
 </pre>
 
 ## Branches Paneel (Tags Tabblad)
@@ -111,6 +111,11 @@ _This file is auto-generated. To update, make the changes in the pkg/i18n direct
 
 <pre>
   <kbd>ctrl+o</kbd>: kopieer de vastgelegde bestandsnaam naar het klembord
+</pre>
+
+## Commit bestanden Paneel (Commit bestanden)
+
+<pre>
   <kbd>c</kbd>: bestand uitchecken
   <kbd>d</kbd>: uitsluit deze commit zijn veranderingen aan dit bestand
   <kbd>o</kbd>: open bestand
@@ -145,23 +150,23 @@ _This file is auto-generated. To update, make the changes in the pkg/i18n direct
   <kbd>v</kbd>: plak commits (cherry-pick)
   <kbd>ctrl+l</kbd>: open log menu
   <kbd>g</kbd>: reset naar deze commit
-  <kbd>enter</kbd>: bekijk gecommite bestanden
   <kbd>space</kbd>: checkout commit
   <kbd>T</kbd>: tag commit
   <kbd>ctrl+y</kbd>: kopieer commit bericht naar klembord
   <kbd>o</kbd>: open commit in browser
+  <kbd>enter</kbd>: bekijk gecommite bestanden
 </pre>
 
 ## Commits Paneel (Reflog Tabblad)
 
 <pre>
-  <kbd>enter</kbd>: bekijk gecommite bestanden
+  <kbd>ctrl+o</kbd>: kopieer commit SHA naar klembord
   <kbd>space</kbd>: checkout commit
   <kbd>g</kbd>: bekijk reset opties
   <kbd>c</kbd>: kopieer commit (cherry-pick)
   <kbd>C</kbd>: kopieer commit reeks (cherry-pick)
   <kbd>ctrl+r</kbd>: reset cherry-picked (gekopieerde) commits selectie
-  <kbd>ctrl+o</kbd>: kopieer commit SHA naar klembord
+  <kbd>enter</kbd>: bekijk gecommite bestanden
 </pre>
 
 ## Extras Paneel
@@ -176,6 +181,7 @@ _This file is auto-generated. To update, make the changes in the pkg/i18n direct
   <kbd>D</kbd>: bekijk reset opties
   <kbd>ctrl+o</kbd>: kopieer de bestandsnaam naar het klembord
   <kbd>ctrl+w</kbd>: Toggle whether or not whitespace changes are shown in the diff view
+  <kbd>d</kbd>: bekijk 'veranderingen ongedaan maken' opties
   <kbd>space</kbd>: toggle staged
   <kbd>ctrl+b</kbd>: Filter files (staged/unstaged)
   <kbd>c</kbd>: Commit veranderingen
@@ -185,7 +191,6 @@ _This file is auto-generated. To update, make the changes in the pkg/i18n direct
   <kbd>e</kbd>: verander bestand
   <kbd>o</kbd>: open bestand
   <kbd>i</kbd>: voeg toe aan .gitignore
-  <kbd>d</kbd>: bekijk 'veranderingen ongedaan maken' opties
   <kbd>r</kbd>: refresh bestanden
   <kbd>s</kbd>: stash-bestanden
   <kbd>S</kbd>: bekijk stash opties
@@ -282,14 +287,14 @@ _This file is auto-generated. To update, make the changes in the pkg/i18n direct
   <kbd>esc</kbd>: sluit menu
 </pre>
 
-## Stash Paneel
+## Stash Paneel (Stash)
 
 <pre>
-  <kbd>enter</kbd>: bekijk bestanden van stash entry
   <kbd>space</kbd>: toepassen
   <kbd>g</kbd>: pop
   <kbd>d</kbd>: laten vallen
   <kbd>n</kbd>: nieuwe branch
+  <kbd>enter</kbd>: bekijk gecommite bestanden
 </pre>
 
 ## Status Paneel
