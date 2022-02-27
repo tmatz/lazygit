@@ -5,7 +5,7 @@ _This file is auto-generated. To update, make the changes in the pkg/i18n direct
 ## Globale Sneltoetsen
 
 <pre>
-  <kbd>ctrl+r</kbd>: wissel naar een recente repo (<c-r>)
+  <kbd>ctrl+r</kbd>: wissel naar een recente repo
   <kbd>pgup</kbd>: scroll naar beneden vanaf hoofdpaneel (fn+up)
   <kbd>pgdown</kbd>: scroll naar beneden vanaf hoofdpaneel (fn+down)
   <kbd>m</kbd>: bekijk merge/rebase opties
@@ -35,6 +35,8 @@ _This file is auto-generated. To update, make the changes in the pkg/i18n direct
   <kbd><</kbd>: scroll naar boven
   <kbd>></kbd>: scroll naar beneden
   <kbd>/</kbd>: start met zoeken
+  <kbd>H</kbd>: scroll left
+  <kbd>L</kbd>: scroll right
   <kbd>]</kbd>: volgende tabblad
   <kbd>[</kbd>: vorige tabblad
 </pre>
@@ -45,12 +47,12 @@ _This file is auto-generated. To update, make the changes in the pkg/i18n direct
   <kbd>ctrl+o</kbd>: kopieer branch name naar klembord
   <kbd>i</kbd>: laat git-flow opties zien
   <kbd>space</kbd>: uitchecken
+  <kbd>n</kbd>: nieuwe branch
   <kbd>o</kbd>: maak een pull-request
   <kbd>O</kbd>: bekijk opties voor pull-aanvraag
   <kbd>ctrl+y</kbd>: kopieer de URL van het pull-verzoek naar het klembord
   <kbd>c</kbd>: uitchecken bij naam
   <kbd>F</kbd>: forceer checkout
-  <kbd>n</kbd>: nieuwe branch
   <kbd>d</kbd>: verwijder branch
   <kbd>r</kbd>: rebase branch
   <kbd>M</kbd>: merge in met huidige checked out branch
@@ -218,8 +220,6 @@ _This file is auto-generated. To update, make the changes in the pkg/i18n direct
 ## Hoofd Paneel (Mergen)
 
 <pre>
-  <kbd>H</kbd>: scroll left
-  <kbd>L</kbd>: scroll right
   <kbd>esc</kbd>: ga terug naar het bestanden paneel
   <kbd>M</kbd>: open external merge tool (git mergetool)
   <kbd>space</kbd>: kies hunk
@@ -234,8 +234,8 @@ _This file is auto-generated. To update, make the changes in the pkg/i18n direct
 ## Hoofd Paneel (Normaal)
 
 <pre>
-  <kbd>Ő</kbd>: scroll omlaag (fn+up)
-  <kbd>ő</kbd>: scroll omhoog (fn+down)
+  <kbd>mouse wheel down</kbd>: scroll omlaag (fn+up)
+  <kbd>mouse wheel up</kbd>: scroll omhoog (fn+down)
 </pre>
 
 ## Hoofd Paneel (Patch Bouwen)
@@ -252,8 +252,6 @@ _This file is auto-generated. To update, make the changes in the pkg/i18n direct
   <kbd>v</kbd>: toggle drag selecteer
   <kbd>V</kbd>: toggle drag selecteer
   <kbd>a</kbd>: toggle selecteer hunk
-  <kbd>H</kbd>: scroll left
-  <kbd>L</kbd>: scroll right
 </pre>
 
 ## Hoofd Paneel (Staging)
@@ -274,8 +272,6 @@ _This file is auto-generated. To update, make the changes in the pkg/i18n direct
   <kbd>v</kbd>: toggle drag selecteer
   <kbd>V</kbd>: toggle drag selecteer
   <kbd>a</kbd>: toggle selecteer hunk
-  <kbd>H</kbd>: scroll left
-  <kbd>L</kbd>: scroll right
   <kbd>c</kbd>: Commit veranderingen
   <kbd>w</kbd>: commit veranderingen zonder pre-commit hook
   <kbd>C</kbd>: commit veranderingen met de git editor
@@ -297,7 +293,7 @@ _This file is auto-generated. To update, make the changes in the pkg/i18n direct
   <kbd>enter</kbd>: bekijk gecommite bestanden
 </pre>
 
-## Status Paneel
+## Status Paneel (Status)
 
 <pre>
   <kbd>e</kbd>: verander config bestand
