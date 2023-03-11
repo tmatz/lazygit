@@ -55,6 +55,7 @@ type IGuiCommon interface {
 	// Only necessary to call if you're not already on the UI thread i.e. you're inside a goroutine.
 	// All controller handlers are executed on the UI thread.
 	OnUIThread(f func() error)
+	ToggleMouse() error
 }
 
 type IPopupHandler interface {

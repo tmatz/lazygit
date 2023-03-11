@@ -102,3 +102,7 @@ func (self *guiCommon) MainViewPairs() types.MainViewPairs {
 		MergeConflicts: self.gui.mergingMainContextPair(),
 	}
 }
+
+func (self *guiCommon) ToggleMouse() error {
+	return self.gui.toggleMouse()
+}

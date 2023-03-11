@@ -200,3 +200,7 @@ func getTabbedView(gui *Gui) *gocui.View {
 func (gui *Gui) render() {
 	gui.c.OnUIThread(func() error { return nil })
 }
+
+func (gui *Gui) toggleMouse() error {
+	return gui.g.ToggleMouse()
+}

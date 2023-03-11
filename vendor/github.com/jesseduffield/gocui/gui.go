@@ -1582,3 +1582,14 @@ func (g *Gui) Snapshot() string {
 
 	return builder.String()
 }
+
+func (g *Gui) ToggleMouse() error {
+	if g.Mouse {
+		g.screen.DisableMouse()
+		g.Mouse = false
+	} else {
+		g.screen.EnableMouse()
+		g.Mouse = true
+	}
+	return nil
+}

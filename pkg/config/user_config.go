@@ -199,6 +199,7 @@ type KeybindingUniversalConfig struct {
 	ToggleWhitespaceInDiffView   string   `yaml:"toggleWhitespaceInDiffView"`
 	IncreaseContextInDiffView    string   `yaml:"increaseContextInDiffView"`
 	DecreaseContextInDiffView    string   `yaml:"decreaseContextInDiffView"`
+	ToggleMouse                  string   `yaml:"toggleMouse"`
 }
 
 type KeybindingStatusConfig struct {
@@ -489,6 +490,7 @@ func GetDefaultConfig() *UserConfig {
 				ToggleWhitespaceInDiffView:   "<c-w>",
 				IncreaseContextInDiffView:    "}",
 				DecreaseContextInDiffView:    "{",
+				ToggleMouse:                  "",
 			},
 			Status: KeybindingStatusConfig{
 				CheckForUpdate:      "u",

@@ -29,6 +29,11 @@ func (self *GlobalController) GetKeybindings(opts types.KeybindingsOpts) []*type
 			Handler:     self.customCommand,
 			Description: self.c.Tr.LcExecuteCustomCommand,
 		},
+		{
+			Key:         opts.GetKey(opts.Config.Universal.ToggleMouse),
+			Handler:     self.toggleMouse,
+			Description: self.c.Tr.LcToggleMouse,
+		},
 	}
 }
 
@@ -60,6 +65,10 @@ func (self *GlobalController) GetCustomCommandsHistorySuggestionsFunc() func(str
 	history := slices.Reverse(self.c.GetAppState().CustomCommandsHistory)
 
 	return helpers.FuzzySearchFunc(history)
+}
+
+func (self *GlobalController) toggleMouse() error {
+	return self.c.ToggleMouse()
 }
 
 func (self *GlobalController) Context() types.Context {

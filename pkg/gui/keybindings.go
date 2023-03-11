@@ -178,6 +178,12 @@ func (self *Gui) GetInitialKeybindings() ([]*types.Binding, []*gocui.ViewMouseBi
 			Description: self.c.Tr.LcPrevScreenMode,
 		},
 		{
+			ViewName:    "",
+			Key:         opts.GetKey(opts.Config.Universal.ToggleMouse),
+			Handler:     self.toggleMouse,
+			Description: self.c.Tr.LcPrevScreenMode,
+		},
+		{
 			ViewName:    "status",
 			Key:         opts.GetKey(opts.Config.Universal.OpenFile),
 			Handler:     self.handleOpenConfig,
