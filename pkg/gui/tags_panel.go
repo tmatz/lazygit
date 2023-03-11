@@ -4,7 +4,7 @@ import "github.com/jesseduffield/lazygit/pkg/gui/types"
 
 func (gui *Gui) tagsRenderToMain() error {
 	pair := gui.c.MainViewPairs().Normal
-	width := pair.Main.GetView().Width()
+	width := pair.Main.GetView().Width() - 40
 	var task types.UpdateTask
 	tag := gui.State.Contexts.Tags.GetSelected()
 	if tag == nil {

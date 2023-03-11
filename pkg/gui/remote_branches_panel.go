@@ -4,7 +4,7 @@ import "github.com/jesseduffield/lazygit/pkg/gui/types"
 
 func (gui *Gui) remoteBranchesRenderToMain() error {
 	pair := gui.c.MainViewPairs().Normal
-	width := pair.Main.GetView().Width()
+	width := pair.Main.GetView().Width() - 40
 	var task types.UpdateTask
 	remoteBranch := gui.State.Contexts.RemoteBranches.GetSelected()
 	if remoteBranch == nil {
