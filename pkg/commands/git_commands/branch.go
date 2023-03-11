@@ -2,6 +2,7 @@ package git_commands
 
 import (
 	"fmt"
+	"strconv"
 	"strings"
 
 	"github.com/jesseduffield/lazygit/pkg/commands/oscommands"
@@ -92,13 +93,14 @@ func (self *BranchCommands) Checkout(branch string, options CheckoutOptions) err
 // Currently it limits the result to 100 commits, but when we get async stuff
 // working we can do lazy loading
 func (self *BranchCommands) GetGraph(branchName string) (string, error) {
-	return self.GetGraphCmdObj(branchName).DontLog().RunWithOutput()
+	return self.GetGraphCmdObj(branchName, -1).DontLog().RunWithOutput()
 }
 
-func (self *BranchCommands) GetGraphCmdObj(branchName string) oscommands.ICmdObj {
+func (self *BranchCommands) GetGraphCmdObj(branchName string, width int) oscommands.ICmdObj {
 	branchLogCmdTemplate := self.UserConfig.Git.BranchLogCmd
 	templateValues := map[string]string{
 		"branchName": self.cmd.Quote(branchName),
+		"width":      strconv.Itoa(width),
 	}
 	return self.cmd.New(utils.ResolvePlaceholderString(branchLogCmdTemplate, templateValues)).DontLog()
 }
